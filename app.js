@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Telegram Web App
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand(); // Fullscreen mode
+    
+    // Set header and background color if needed
+    tg.setHeaderColor('#000000');
+    tg.setBackgroundColor('#000000');
+
     const banner = document.getElementById('elastic-banner');
     const bannerContainer = document.getElementById('banner-container');
     const viewMoreBtn = document.getElementById('view-more-btn');

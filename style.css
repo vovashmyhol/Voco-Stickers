@@ -23,6 +23,8 @@ body {
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
     line-height: 1.5;
+    /* Prevent pull-to-refresh and collapsing on mobile */
+    overscroll-behavior: none;
 }
 
 h1, h2, h3 {

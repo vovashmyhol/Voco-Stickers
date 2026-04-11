@@ -1,5 +1,5 @@
 /**
- * VOCO Stickers Mini App — единый кастомный скролл
+ * VOCO Stickers Mini App
  */
 
 try {
@@ -19,9 +19,10 @@ try {
 
     function initWebApp() {
         tg.expand();
-        if (tg.requestFullscreen)    tg.requestFullscreen();
-        if (tg.setHeaderColor)       tg.setHeaderColor('transparent');
-        if (tg.setBackgroundColor)   tg.setBackgroundColor('#06080d');
+        if (tg.requestFullscreen)  tg.requestFullscreen();
+        if (tg.setHeaderColor)     tg.setHeaderColor('transparent');
+        if (tg.setBackgroundColor) tg.setBackgroundColor('#06080d');
+        if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
         if (typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes();
         if (tg.isVerticalSwipesEnabled !== undefined) tg.isVerticalSwipesEnabled = false;
         updateSafeArea();
@@ -40,167 +41,136 @@ document.addEventListener('DOMContentLoaded', () => {
     const bannerContainer = document.getElementById('banner-container');
     const appEl           = document.getElementById('app');
 
-    const BANNER_H      = 220;
-    const VIEWPORT_H    = () => window.innerHeight;
-    const CONTENT_H     = () => appEl.scrollHeight;
-    const MAX_SCROLL    = () => Math.max(0, CONTENT_H() - VIEWPORT_H());
+    const BANNER_H   = 220;
+    const MAX_SCROLL = () => Math.max(0, appEl.scrollHeight - window.innerHeight);
 
-    // ── Текущая позиция скролла (в пикселях, 0 = самый верх) ─────────────────
-    let scrollY   = 0;
-    let velocity  = 0;
-    let rafId     = null;
-
-    // ── Блокируем нативный скролл полностью ───────────────────────────────────
-    document.body.style.overflow   = 'hidden';
-    document.body.style.height     = '100vh';
+    // Блокируем нативный скролл
     document.documentElement.style.overflow = 'hidden';
+    document.documentElement.style.height   = '100%';
+    document.body.style.overflow = 'hidden';
+    document.body.style.height   = '100%';
+    appEl.style.position   = 'relative';
+    appEl.style.willChange = 'transform';
 
-    // appEl — наш «окно просмотра», двигаем его целиком через translateY
-    appEl.style.willChange  = 'transform';
-    appEl.style.position    = 'relative';
+    let scrollY  = 0;
+    let velocity = 0;
+    let rafId    = null;
 
-    // ── Применяем скролл ───────────────────────────────────────────────────────
-    function applyScroll(y, instant = false) {
+    // Применяем скролл + параллакс баннера
+    function applyScroll(y) {
         scrollY = Math.max(0, Math.min(y, MAX_SCROLL()));
-
-        // Параллакс баннера
-        const parallax = scrollY * 0.4;
-        banner.style.transition    = 'none';
-        banner.style.transform     = `translateY(${parallax}px)`;
-
-        // Двигаем весь контент вверх
-        appEl.style.transition = instant ? 'none' : '';
-        appEl.style.transform  = `translateY(${-scrollY}px)`;
+        appEl.style.transition  = 'none';
+        appEl.style.transform   = `translateY(${-scrollY}px)`;
+        banner.style.transition = 'none';
+        // Параллакс только когда не на самом верху
+        banner.style.transform  = scrollY > 0
+            ? `translateY(${scrollY * 0.4}px)`
+            : 'scale(1)';
+        bannerContainer.style.height = BANNER_H + 'px';
     }
 
-    // ── Инерция ───────────────────────────────────────────────────────────────
+    // Инерция
     function momentumLoop() {
-        if (Math.abs(velocity) < 0.5) {
-            velocity = 0;
-            rafId = null;
-            return;
-        }
-        velocity *= 0.92;
-        applyScroll(scrollY + velocity, true);
+        if (Math.abs(velocity) < 0.5) { velocity = 0; rafId = null; return; }
+        velocity *= 0.9;
+        applyScroll(scrollY + velocity);
         rafId = requestAnimationFrame(momentumLoop);
     }
 
-    // ── Elastic (резиновый) отскок ────────────────────────────────────────────
-    let elasticOffset = 0; // доп. смещение за пределы контента
-
-    function applyElastic(extra) {
-        elasticOffset = extra;
-        appEl.style.transition = 'none';
-        appEl.style.transform  = `translateY(${-scrollY + extra}px)`;
-    }
-
-    function releaseElastic() {
-        appEl.style.transition = 'transform 0.45s cubic-bezier(0.175,0.885,0.32,1.275)';
-        appEl.style.transform  = `translateY(${-scrollY}px)`;
-        elasticOffset = 0;
-
-        // Сброс баннера если были на верху
-        if (scrollY === 0) {
-            banner.style.transition    = 'transform 0.45s cubic-bezier(0.175,0.885,0.32,1.275)';
-            bannerContainer.style.transition = 'height 0.45s cubic-bezier(0.175,0.885,0.32,1.275)';
-            banner.style.transform     = 'scale(1)';
-            bannerContainer.style.height = BANNER_H + 'px';
-        }
-    }
-
-    // ── Touch ─────────────────────────────────────────────────────────────────
+    // ── Touch ──────────────────────────────────────────────────────────────
     let touchStartY = 0;
-    let lastTouchY  = 0;
-    let lastTouchT  = 0;
+    let lastY       = 0;
+    let lastT       = 0;
     let touchVel    = 0;
     let isElastic   = false;
 
     window.addEventListener('touchstart', (e) => {
-        // Останавливаем инерцию
         if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-        velocity    = 0;
-        isElastic   = false;
-
-        touchStartY = e.touches[0].pageY;
-        lastTouchY  = touchStartY;
-        lastTouchT  = Date.now();
-        touchVel    = 0;
+        velocity = 0;
+        touchStartY = lastY = e.touches[0].pageY;
+        lastT    = Date.now();
+        touchVel = 0;
+        isElastic = false;
     }, { passive: true });
 
     window.addEventListener('touchmove', (e) => {
-        // Всегда блокируем нативный скролл — мы управляем сами
-        if (e.cancelable) e.preventDefault();
+        e.preventDefault(); // Блокируем TG от перехвата
 
-        const now  = Date.now();
-        const y    = e.touches[0].pageY;
-        const dy   = lastTouchY - y;   // >0 = скролл вверх, <0 = вниз
-        const dt   = now - lastTouchT || 1;
+        const now = Date.now();
+        const y   = e.touches[0].pageY;
+        const dy  = lastY - y;  // >0 = тянем вверх (скролл вниз), <0 = тянем вниз (скролл вверх)
+        const dt  = now - lastT || 1;
 
-        touchVel   = dy / dt * 16;     // px за кадр (~16ms)
-        lastTouchY = y;
-        lastTouchT = now;
+        touchVel = dy / dt * 16;
+        lastY    = y;
+        lastT    = now;
 
-        const newY = scrollY + dy;
+        const target = scrollY + dy;
 
-        if (newY < 0) {
-            // ─ Резина СВЕРХУ (тянем вниз за пределы) ─
-            isElastic = true;
-            const over  = -newY;
-            const damp  = over / 3;
+        if (target < 0) {
+            // ── Резина СВЕРХУ: scrollY=0 и тянем вниз (dy < 0) ──────────
+            isElastic    = true;
+            const over   = -target;          // насколько вышли за 0
+            const damp   = over / 3;         // демпфинг
 
             // Растягиваем баннер
-            const scale = 1 + damp / 220;
-            const extra = damp * 0.45;
+            const scale  = 1 + damp / 220;
+            const extra  = damp * 0.45;
             banner.style.transition          = 'none';
             bannerContainer.style.transition = 'none';
             banner.style.transform           = `scale(${scale})`;
             bannerContainer.style.height     = (BANNER_H + extra) + 'px';
 
-            applyElastic(damp);
+            // Сдвигаем контент вниз
+            appEl.style.transition = 'none';
+            appEl.style.transform  = `translateY(${damp}px)`;
 
-        } else if (newY > MAX_SCROLL()) {
-            // ─ Резина СНИЗУ (тянем вверх за пределы) ─
-            isElastic = true;
-            const over = newY - MAX_SCROLL();
-            const damp = -(over / 3);
-            applyElastic(damp);
+        } else if (target > MAX_SCROLL()) {
+            // ── Резина СНИЗУ ─────────────────────────────────────────────
+            isElastic  = true;
+            const over = target - MAX_SCROLL();
+            const damp = over / 3;
+
+            appEl.style.transition = 'none';
+            appEl.style.transform  = `translateY(${-(MAX_SCROLL() + damp)}px)`;
 
         } else {
-            // ─ Обычный скролл ─
+            // ── Обычный скролл ────────────────────────────────────────────
             isElastic = false;
-            applyScroll(newY, true);
+            applyScroll(target);
         }
     }, { passive: false });
 
     window.addEventListener('touchend', () => {
         if (isElastic) {
+            // Пружинный возврат
+            appEl.style.transition = 'transform 0.5s cubic-bezier(0.175,0.885,0.32,1.275)';
+            appEl.style.transform  = `translateY(${-scrollY}px)`;
+
+            banner.style.transition          = 'transform 0.5s cubic-bezier(0.175,0.885,0.32,1.275)';
+            bannerContainer.style.transition = 'height 0.5s cubic-bezier(0.175,0.885,0.32,1.275)';
+            banner.style.transform     = scrollY > 0 ? `translateY(${scrollY * 0.4}px)` : 'scale(1)';
+            bannerContainer.style.height = BANNER_H + 'px';
+
             isElastic = false;
-            releaseElastic();
         } else {
-            // Запускаем инерцию
             velocity = touchVel;
             rafId = requestAnimationFrame(momentumLoop);
         }
     }, { passive: true });
 
-    // ── Modal Logic ───────────────────────────────────────────────────────────
+    // ── Modal ──────────────────────────────────────────────────────────────
     const purchaseModal = document.getElementById('purchase-modal');
     const viewMoreBtn   = document.getElementById('view-more-btn');
     const closeModalBtn = document.getElementById('close-modal');
     const buyButton     = document.querySelector('.buy-button');
 
-    const openModal = () => {
-        purchaseModal.classList.add('active');
-    };
-    const closeModal = () => {
-        purchaseModal.classList.remove('active');
-    };
+    const openModal  = () => purchaseModal.classList.add('active');
+    const closeModal = () => purchaseModal.classList.remove('active');
 
     if (viewMoreBtn)   viewMoreBtn.addEventListener('click', openModal);
     if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-    purchaseModal.addEventListener('click', (e) => {
-        if (e.target === purchaseModal) closeModal();
-    });
+    purchaseModal.addEventListener('click', (e) => { if (e.target === purchaseModal) closeModal(); });
 
     if (buyButton) {
         buyButton.addEventListener('click', () => {

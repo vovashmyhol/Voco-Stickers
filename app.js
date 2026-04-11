@@ -64,6 +64,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Если тянем вниз, и мы наверху
         if (diff > 0 && window.scrollY <= 0) {
+            // ЭТОТ КОД БЛОКИРУЕТ СВОРАЧИВАНИЕ ОКНА В TELEGRAM
+            if (e.cancelable) {
+                e.preventDefault();
+            }
             
             const scale = 1 + diff / 400;
             const extraHeight = diff * 0.5;
@@ -77,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isTouching = false;
             resetBanner();
         }
-    }, { passive: true });
+    }, { passive: false }); // Отключаем passive, чтобы работал preventDefault
 
     function resetBanner() {
         banner.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';

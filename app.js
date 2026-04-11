@@ -4,6 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     tg.ready();
     tg.expand(); // Fullscreen mode
     
+    // Disable horizontal and vertical swipe logic to keep it fullscreen
+    if (tg.isVerticalSwipeEnabled !== undefined) {
+        tg.isVerticalSwipeEnabled = false; 
+    }
+    
     // Set header and background color if needed
     tg.setHeaderColor('#000000');
     tg.setBackgroundColor('#000000');

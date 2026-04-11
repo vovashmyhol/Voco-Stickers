@@ -10,21 +10,25 @@
     --transition-smooth: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-* {
-    box-sizing: border-box;
+html, body {
+    height: 100%;
+    width: 100%;
     margin: 0;
     padding: 0;
-    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
 }
 
 body {
     background-color: var(--bg-color);
     color: var(--text-primary);
     font-family: 'Inter', sans-serif;
-    overflow-x: hidden;
     line-height: 1.5;
     /* Prevent pull-to-refresh and collapsing on mobile */
     overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+    height: 100vh;
+    height: -webkit-fill-available;
+    overflow-y: auto;
 }
 
 h1, h2, h3 {

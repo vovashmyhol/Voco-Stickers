@@ -19,11 +19,24 @@ try {
 
     function initWebApp() {
         tg.expand();
+
+        // Fullscreen
         if (tg.requestFullscreen) tg.requestFullscreen();
+
+        // Colors
         if (tg.setHeaderColor) tg.setHeaderColor('transparent');
         if (tg.setBackgroundColor) tg.setBackgroundColor('#06080d');
-        if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
-        else if (tg.isVerticalSwipeEnabled !== undefined) tg.isVerticalSwipeEnabled = false;
+
+        // --- КЛЮЧЕВОЕ: отключаем вертикальные свайпы ---
+        // Это предотвращает закрытие/сворачивание приложения при свайпе вниз
+        if (typeof tg.disableVerticalSwipes === 'function') {
+            tg.disableVerticalSwipes();
+        }
+        // Для старых версий SDK
+        if (tg.isVerticalSwipesEnabled !== undefined) {
+            tg.isVerticalSwipesEnabled = false;
+        }
+
         updateSafeArea();
     }
 
@@ -42,15 +55,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const purchaseModal = document.getElementById('purchase-modal');
     const closeModalBtn = document.getElementById('close-modal');
     const buyButton = document.querySelector('.buy-button');
-    const scrollContainer = document.body;
 
-    // 5. Elastic Scroll Effect (Возвращаем проверенную классическую версию)
+    // --- Elastic Scroll Effect ---
     let startY = 0;
     let isTouching = false;
 
     window.addEventListener('touchstart', (e) => {
-        // Захватываем жест, только если страница прокручена в самый верх
-        if (window.scrollY <= 0) { 
+        if (window.scrollY <= 0) {
             startY = e.touches[0].pageY;
             isTouching = true;
         }
@@ -62,26 +73,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentY = e.touches[0].pageY;
         const diff = currentY - startY;
 
-        // Если тянем вниз, и мы наверху
         if (diff > 0 && window.scrollY <= 0) {
-            // ЭТОТ КОД БЛОКИРУЕТ СВОРАЧИВАНИЕ ОКНА В TELEGRAM
+            // Блокируем нативный скролл и сворачивание окна TG
             if (e.cancelable) {
                 e.preventDefault();
             }
-            
+
             const scale = 1 + diff / 400;
             const extraHeight = diff * 0.5;
-            
+
             banner.style.transition = 'none';
             bannerContainer.style.transition = 'none';
             banner.style.transform = `scale(${scale})`;
             bannerContainer.style.height = `${220 + extraHeight}px`;
-            
+
         } else if (diff < 0) {
             isTouching = false;
             resetBanner();
         }
-    }, { passive: false }); // Отключаем passive, чтобы работал preventDefault
+    }, { passive: false });
 
     function resetBanner() {
         banner.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
@@ -97,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Modal Logic
+    // --- Modal Logic ---
     const openModal = () => {
         purchaseModal.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -132,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Parallax
+    // --- Parallax ---
     window.addEventListener('scroll', () => {
         if (window.scrollY > 0) {
             const scroll = window.scrollY;

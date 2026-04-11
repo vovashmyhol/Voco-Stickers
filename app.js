@@ -19,20 +19,13 @@ try {
 
     function initWebApp() {
         tg.expand();
-
-        // Fullscreen
         if (tg.requestFullscreen) tg.requestFullscreen();
-
-        // Colors
         if (tg.setHeaderColor) tg.setHeaderColor('transparent');
         if (tg.setBackgroundColor) tg.setBackgroundColor('#06080d');
 
-        // --- КЛЮЧЕВОЕ: отключаем вертикальные свайпы ---
-        // Это предотвращает закрытие/сворачивание приложения при свайпе вниз
         if (typeof tg.disableVerticalSwipes === 'function') {
             tg.disableVerticalSwipes();
         }
-        // Для старых версий SDK
         if (tg.isVerticalSwipesEnabled !== undefined) {
             tg.isVerticalSwipesEnabled = false;
         }
@@ -56,43 +49,77 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('close-modal');
     const buyButton = document.querySelector('.buy-button');
 
-    // --- Elastic Scroll Effect ---
+    // Элемент для эффекта снизу
+    const bottomEl = document.querySelector('.content-wrapper');
+
+    // --- Elastic Scroll Effect (TOP + BOTTOM) ---
     let startY = 0;
     let isTouching = false;
+    let direction = null; // 'top' | 'bottom'
+
+    function isAtBottom() {
+        return (window.innerHeight + window.scrollY) >= document.body.scrollHeight - 2;
+    }
+
+    function isAtTop() {
+        return window.scrollY <= 0;
+    }
 
     window.addEventListener('touchstart', (e) => {
-        // Даем небольшой запас пикселей для срабатывания на мобилках
-        if (window.scrollY <= 5) {
-            startY = e.touches[0].clientY;
+        startY = e.touches[0].pageY;
+        isTouching = false;
+        direction = null;
+
+        if (isAtTop()) {
+            direction = 'top';
+            isTouching = true;
+        } else if (isAtBottom()) {
+            direction = 'bottom';
             isTouching = true;
         }
     }, { passive: true });
 
     window.addEventListener('touchmove', (e) => {
-        if (!isTouching) return;
+        if (!isTouching || !direction) return;
 
-        const currentY = e.touches[0].clientY;
+        const currentY = e.touches[0].pageY;
         const diff = currentY - startY;
 
-        if (diff > 0 && window.scrollY <= 5) {
-            // Блокируем нативный скролл и сворачивание окна TG
-            if (e.cancelable) {
-                e.preventDefault();
-            }
+        if (direction === 'top' && diff > 0) {
+            // Тянем вниз на самом верху — эффект растяжения баннера
+            if (e.cancelable) e.preventDefault();
 
-            const scale = 1 + diff / 300; // Немного усилил визуальный эффект растяжения
-            const extraHeight = diff * 0.6;
+            const scale = 1 + diff / 400;
+            const extraHeight = diff * 0.5;
 
             banner.style.transition = 'none';
             bannerContainer.style.transition = 'none';
             banner.style.transform = `scale(${scale})`;
             bannerContainer.style.height = `${220 + extraHeight}px`;
 
-        } else if (diff < 0) {
+        } else if (direction === 'bottom' && diff < 0) {
+            // Тянем вверх на самом низу — эффект пружины снизу
+            if (e.cancelable) e.preventDefault();
+
+            const pull = Math.abs(diff);
+            const translateY = -(pull * 0.3);
+
+            bottomEl.style.transition = 'none';
+            bottomEl.style.transform = `translateY(${translateY}px)`;
+
+        } else {
+            // Потянули не в ту сторону — отменяем
             isTouching = false;
-            resetBanner();
+            resetAll();
         }
     }, { passive: false });
+
+    window.addEventListener('touchend', () => {
+        if (isTouching) {
+            isTouching = false;
+            resetAll();
+        }
+    });
 
     function resetBanner() {
         banner.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
@@ -101,10 +128,21 @@ document.addEventListener('DOMContentLoaded', () => {
         bannerContainer.style.height = '220px';
     }
 
-    window.addEventListener('touchend', () => {
-        if (isTouching) {
-            isTouching = false;
-            resetBanner();
+    function resetBottom() {
+        bottomEl.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        bottomEl.style.transform = 'translateY(0)';
+    }
+
+    function resetAll() {
+        resetBanner();
+        resetBottom();
+    }
+
+    // --- Parallax при обычном скролле ---
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 0) {
+            const scroll = window.scrollY;
+            banner.style.transform = `translateY(${scroll * 0.4}px)`;
         }
     });
 
@@ -142,12 +180,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
         });
     }
-
-    // --- Parallax (Disabled by User) ---
-    /* window.addEventListener('scroll', () => {
-        if (window.scrollY > 0) {
-            const scroll = window.scrollY;
-            banner.style.transform = `translateY(${scroll * 0.4}px)`;
-        }
-    }); */
 });

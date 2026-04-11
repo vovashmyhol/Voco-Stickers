@@ -27,8 +27,7 @@ body {
     color: var(--text-primary);
     font-family: 'Inter', sans-serif;
     line-height: 1.5;
-    /* Prevent pull-to-refresh and collapsing on mobile */
-    overscroll-behavior: none;
+    /* Native bounce scroll enabled specially for the bottom of the page */
     -webkit-overflow-scrolling: touch;
 }
 

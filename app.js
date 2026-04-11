@@ -61,8 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let isTouching = false;
 
     window.addEventListener('touchstart', (e) => {
-        if (window.scrollY <= 0) {
-            startY = e.touches[0].pageY;
+        // Даем небольшой запас пикселей для срабатывания на мобилках
+        if (window.scrollY <= 5) {
+            startY = e.touches[0].clientY;
             isTouching = true;
         }
     }, { passive: true });
@@ -70,17 +71,17 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('touchmove', (e) => {
         if (!isTouching) return;
 
-        const currentY = e.touches[0].pageY;
+        const currentY = e.touches[0].clientY;
         const diff = currentY - startY;
 
-        if (diff > 0 && window.scrollY <= 0) {
+        if (diff > 0 && window.scrollY <= 5) {
             // Блокируем нативный скролл и сворачивание окна TG
             if (e.cancelable) {
                 e.preventDefault();
             }
 
-            const scale = 1 + diff / 400;
-            const extraHeight = diff * 0.5;
+            const scale = 1 + diff / 300; // Немного усилил визуальный эффект растяжения
+            const extraHeight = diff * 0.6;
 
             banner.style.transition = 'none';
             bannerContainer.style.transition = 'none';

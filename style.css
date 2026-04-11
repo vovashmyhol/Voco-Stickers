@@ -17,11 +17,9 @@
 }
 
 html, body {
-    height: 100%;
     width: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden;
 }
 
 body {
@@ -32,9 +30,6 @@ body {
     /* Prevent pull-to-refresh and collapsing on mobile */
     overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;
-    height: 100vh;
-    height: -webkit-fill-available;
-    overflow-y: auto;
 }
 
 h1, h2, h3 {

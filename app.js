@@ -44,40 +44,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const buyButton = document.querySelector('.buy-button');
     const scrollContainer = document.body;
 
-    // 5. Elastic Scroll Effect (Robust Version)
+    // 5. Elastic Scroll Effect (Возвращаем проверенную классическую версию)
     let startY = 0;
     let isTouching = false;
 
-    // Используем passive: false, чтобы иметь возможность отменить стандартный скролл браузера
-    scrollContainer.addEventListener('touchstart', (e) => {
-        if (scrollContainer.scrollTop <= 2) { 
+    window.addEventListener('touchstart', (e) => {
+        // Захватываем жест, только если страница прокручена в самый верх
+        if (window.scrollY <= 0) { 
             startY = e.touches[0].pageY;
             isTouching = true;
         }
     }, { passive: true });
 
-    scrollContainer.addEventListener('touchmove', (e) => {
+    window.addEventListener('touchmove', (e) => {
         if (!isTouching) return;
 
         const currentY = e.touches[0].pageY;
         const diff = currentY - startY;
 
-        if (diff > 0 && scrollContainer.scrollTop <= 0) {
-            // Если мы тянем вниз в самом топе, блокируем системный "баунс"
-            if (e.cancelable) e.preventDefault(); 
+        // Если тянем вниз, и мы наверху
+        if (diff > 0 && window.scrollY <= 0) {
             
-            const scale = 1 + diff / 350; // Увеличил чувствительность
+            const scale = 1 + diff / 400;
             const extraHeight = diff * 0.5;
             
             banner.style.transition = 'none';
             bannerContainer.style.transition = 'none';
             banner.style.transform = `scale(${scale})`;
             bannerContainer.style.height = `${220 + extraHeight}px`;
+            
         } else if (diff < 0) {
             isTouching = false;
             resetBanner();
         }
-    }, { passive: false }); // Важно: passive: false для preventDefault
+    }, { passive: true });
 
     function resetBanner() {
         banner.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
@@ -129,9 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Parallax
-    scrollContainer.addEventListener('scroll', () => {
-        if (scrollContainer.scrollTop > 0) {
-            const scroll = scrollContainer.scrollTop;
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 0) {
+            const scroll = window.scrollY;
             banner.style.transform = `translateY(${scroll * 0.4}px)`;
         }
     });

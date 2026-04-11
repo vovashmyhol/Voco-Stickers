@@ -1,25 +1,23 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Telegram Web App
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    
-    // Expand the app
-    tg.expand();
-    
-    // Request full screen mode (new API feature)
-    if (tg.requestFullscreen) {
-        tg.requestFullscreen();
-    }
-    
-    // Disable horizontal and vertical swipe logic to keep it fullscreen
-    if (tg.isVerticalSwipeEnabled !== undefined) {
-        tg.isVerticalSwipeEnabled = false; 
-    }
-    
-    // Set the theme colors for a seamless look
-    if (tg.setHeaderColor) tg.setHeaderColor('transparent');
-    if (tg.setBackgroundColor) tg.setBackgroundColor('#06080d');
+// 1. Мгновенная инициализация Telegram Web App
+const tg = window.Telegram.WebApp;
+tg.ready();
 
+// Расширяем и запрашиваем фуллскрин сразу
+tg.expand();
+if (tg.requestFullscreen) {
+  tg.requestFullscreen();
+}
+
+// Устанавливаем прозрачный заголовок и специфический фон
+if (tg.setHeaderColor) tg.setHeaderColor('transparent');
+if (tg.setBackgroundColor) tg.setBackgroundColor('#06080d');
+
+// Отключаем вертикальный свайп, чтобы приложение не сворачивалось
+if (tg.isVerticalSwipeEnabled !== undefined) {
+    tg.isVerticalSwipeEnabled = false; 
+}
+
+document.addEventListener('DOMContentLoaded', () => {
     const banner = document.getElementById('elastic-banner');
     const bannerContainer = document.getElementById('banner-container');
     const viewMoreBtn = document.getElementById('view-more-btn');
@@ -27,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('close-modal');
     const buyButton = document.querySelector('.buy-button');
 
-    // 1. Elastic Scroll Effect
+    // 2. Elastic Scroll Effect (с доработкой под фуллскрин)
     let startY = 0;
     let isTouching = false;
 
@@ -45,15 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const diff = currentY - startY;
 
         if (diff > 0) {
-            // Pulling down
             const scale = 1 + diff / 500;
             banner.style.transform = `scale(${scale})`;
             bannerContainer.style.height = `${220 + diff * 0.5}px`;
-            
-            // Prevent default browser pull-to-refresh if possible
-            if (diff > 10) {
-                // e.preventDefault(); // Might need non-passive listener
-            }
         }
     }, { passive: true });
 
@@ -70,10 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     });
 
-    // 2. Modal Logic
+    // 3. Modal Logic
     const openModal = () => {
         purchaseModal.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Prevent background scroll
+        document.body.style.overflow = 'hidden';
     };
 
     const closeModal = () => {
@@ -84,23 +76,19 @@ document.addEventListener('DOMContentLoaded', () => {
     viewMoreBtn.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', closeModal);
 
-    // Close modal on background click
     purchaseModal.addEventListener('click', (e) => {
-        if (e.target === purchaseModal) {
-            closeModal();
-        }
+        if (e.target === purchaseModal) closeModal();
     });
 
-    // 3. Buy Button Feedback
+    // 4. Buy Button Feedback
     buyButton.addEventListener('click', () => {
         buyButton.textContent = 'Обработка...';
-        buyButton.style.backgroundColor = '#34c759'; // Success green
+        buyButton.style.backgroundColor = '#34c759';
         
         setTimeout(() => {
             buyButton.textContent = 'Открыто!';
             setTimeout(() => {
                 closeModal();
-                // Reset button for next time
                 setTimeout(() => {
                     buyButton.textContent = 'Open';
                     buyButton.style.backgroundColor = '';
@@ -109,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     });
 
-    // 4. Parallax on Scroll (Standard)
+    // 5. Parallax
     window.addEventListener('scroll', () => {
         if (window.scrollY > 0) {
             const scroll = window.scrollY;

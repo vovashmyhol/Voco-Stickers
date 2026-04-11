@@ -71,19 +71,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('close-modal');
     const buyButton = document.querySelector('.buy-button');
 
-    // Elastic Scroll Effect
+    // 5. Elastic Scroll Effect
     let startY = 0;
     let isTouching = false;
 
+    // Используем body для отслеживания скролла, так как в фуллскрине скроллится он
+    const scrollContainer = document.body;
+
     window.addEventListener('touchstart', (e) => {
-        if (window.scrollY === 0) {
+        if (scrollContainer.scrollTop <= 0) {
             startY = e.touches[0].pageY;
             isTouching = true;
         }
     }, { passive: true });
 
     window.addEventListener('touchmove', (e) => {
-        if (!isTouching || window.scrollY > 0) return;
+        if (!isTouching || scrollContainer.scrollTop > 0) {
+            isTouching = false;
+            return;
+        }
 
         const currentY = e.touches[0].pageY;
         const diff = currentY - startY;
@@ -92,6 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const scale = 1 + diff / 500;
             banner.style.transform = `scale(${scale})`;
             bannerContainer.style.height = `${220 + diff * 0.5}px`;
+            
+            // Если тянем сильно вниз, предотвращаем стандартное поведение
+            if (diff > 10 && e.cancelable) {
+                // e.preventDefault(); 
+            }
         }
     }, { passive: true });
 
@@ -146,9 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Parallax
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 0) {
-            const scroll = window.scrollY;
+    scrollContainer.addEventListener('scroll', () => {
+        if (scrollContainer.scrollTop > 0) {
+            const scroll = scrollContainer.scrollTop;
             banner.style.transform = `translateY(${scroll * 0.4}px)`;
         }
     });

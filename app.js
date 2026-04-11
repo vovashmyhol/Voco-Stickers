@@ -16,9 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
         tg.isVerticalSwipeEnabled = false; 
     }
     
-    // Set header and background color if needed
-    tg.setHeaderColor('#000000');
-    tg.setBackgroundColor('#000000');
+    // Set the theme colors for a seamless look
+    if (tg.setHeaderColor) tg.setHeaderColor('transparent');
+    if (tg.setBackgroundColor) tg.setBackgroundColor('#06080d');
 
     const banner = document.getElementById('elastic-banner');
     const bannerContainer = document.getElementById('banner-container');

@@ -2,7 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Telegram Web App
     const tg = window.Telegram.WebApp;
     tg.ready();
-    tg.expand(); // Fullscreen mode
+    
+    // Expand the app
+    tg.expand();
+    
+    // Request full screen mode (new API feature)
+    if (tg.requestFullscreen) {
+        tg.requestFullscreen();
+    }
     
     // Disable horizontal and vertical swipe logic to keep it fullscreen
     if (tg.isVerticalSwipeEnabled !== undefined) {

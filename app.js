@@ -142,11 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Parallax ---
-    window.addEventListener('scroll', () => {
+    // --- Parallax (Disabled by User) ---
+    /* window.addEventListener('scroll', () => {
         if (window.scrollY > 0) {
             const scroll = window.scrollY;
             banner.style.transform = `translateY(${scroll * 0.4}px)`;
         }
-    });
+    }); */
 });

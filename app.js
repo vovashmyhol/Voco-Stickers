@@ -1,22 +1,68 @@
-// 1. Мгновенная инициализация Telegram Web App
-const tg = window.Telegram.WebApp;
-tg.ready();
+/**
+ * VOCO Stickers Mini App - True Fullscreen Implementation
+ * 
+ * Содержит полную логику инициализации Telegram WebApp SDK, 
+ * настройки Safe Area и предотвращение сворачивания.
+ */
 
-// Расширяем и запрашиваем фуллскрин сразу
-tg.expand();
-if (tg.requestFullscreen) {
-  tg.requestFullscreen();
+try {
+    const tg = window.Telegram.WebApp;
+
+    // 1. Функция обновления безопасных зон (Safe Area)
+    function updateSafeArea() {
+        try {
+            // Пытаемся получить данные из SDK или используем 0
+            const inset = tg.contentSafeAreaInset || { top: 0, bottom: 0, left: 0, right: 0 };
+            const root = document.documentElement;
+            
+            root.style.setProperty('--safeTop', (inset.top || 0) + 'px');
+            root.style.setProperty('--safeBottom', (inset.bottom || 0) + 'px');
+            root.style.setProperty('--safeLeft', (inset.left || 0) + 'px');
+            root.style.setProperty('--safeRight', (inset.right || 0) + 'px');
+            
+            console.log('Safe Area Updated:', inset);
+        } catch (e) {
+            console.error('Error updating safe areas:', e);
+        }
+    }
+
+    // 2. Основная инициализация (Выполняется максимально рано)
+    function initWebApp() {
+        tg.ready();
+        
+        // Расширяем и запрашиваем полноэкранный режим
+        tg.expand();
+        if (tg.requestFullscreen) {
+            tg.requestFullscreen();
+        }
+
+        // Настройка визуального стиля "Прозрачный заголовок"
+        if (tg.setHeaderColor) tg.setHeaderColor('transparent');
+        if (tg.setBackgroundColor) tg.setBackgroundColor('#06080d');
+
+        // Отключение свайпов для предотвращения закрытия в фуллскрине
+        if (tg.disableVerticalSwipes) {
+            tg.disableVerticalSwipes();
+        } else if (tg.isVerticalSwipeEnabled !== undefined) {
+            tg.isVerticalSwipeEnabled = false;
+        }
+
+        // Первичное обновление отступов
+        updateSafeArea();
+    }
+
+    // Запуск инициализации
+    initWebApp();
+
+    // 3. Обработка событий изменения окна/вьюпорта
+    tg.onEvent('viewportChanged', updateSafeArea);
+    window.addEventListener('resize', updateSafeArea);
+
+} catch (e) {
+    console.error('Telegram SDK Init Error:', e);
 }
 
-// Устанавливаем прозрачный заголовок и специфический фон
-if (tg.setHeaderColor) tg.setHeaderColor('transparent');
-if (tg.setBackgroundColor) tg.setBackgroundColor('#06080d');
-
-// Отключаем вертикальный свайп, чтобы приложение не сворачивалось
-if (tg.isVerticalSwipeEnabled !== undefined) {
-    tg.isVerticalSwipeEnabled = false; 
-}
-
+// 4. Стандартная логика интерфейса после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
     const banner = document.getElementById('elastic-banner');
     const bannerContainer = document.getElementById('banner-container');
@@ -25,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('close-modal');
     const buyButton = document.querySelector('.buy-button');
 
-    // 2. Elastic Scroll Effect (с доработкой под фуллскрин)
+    // Elastic Scroll Effect
     let startY = 0;
     let isTouching = false;
 
@@ -62,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     });
 
-    // 3. Modal Logic
+    // Modal Logic
     const openModal = () => {
         purchaseModal.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -73,31 +119,33 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = '';
     };
 
-    viewMoreBtn.addEventListener('click', openModal);
-    closeModalBtn.addEventListener('click', closeModal);
+    if (viewMoreBtn) viewMoreBtn.addEventListener('click', openModal);
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
 
     purchaseModal.addEventListener('click', (e) => {
         if (e.target === purchaseModal) closeModal();
     });
 
-    // 4. Buy Button Feedback
-    buyButton.addEventListener('click', () => {
-        buyButton.textContent = 'Обработка...';
-        buyButton.style.backgroundColor = '#34c759';
-        
-        setTimeout(() => {
-            buyButton.textContent = 'Открыто!';
+    // Buy Button Feedback
+    if (buyButton) {
+        buyButton.addEventListener('click', () => {
+            buyButton.textContent = 'Обработка...';
+            buyButton.style.backgroundColor = '#34c759';
+            
             setTimeout(() => {
-                closeModal();
+                buyButton.textContent = 'Открыто!';
                 setTimeout(() => {
-                    buyButton.textContent = 'Open';
-                    buyButton.style.backgroundColor = '';
-                }, 500);
-            }, 1000);
-        }, 1500);
-    });
+                    closeModal();
+                    setTimeout(() => {
+                        buyButton.textContent = 'Open';
+                        buyButton.style.backgroundColor = '';
+                    }, 500);
+                }, 1000);
+            }, 1500);
+        });
+    }
 
-    // 5. Parallax
+    // Parallax
     window.addEventListener('scroll', () => {
         if (window.scrollY > 0) {
             const scroll = window.scrollY;

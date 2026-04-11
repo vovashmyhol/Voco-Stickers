@@ -8,6 +8,12 @@
     --border-radius-lg: 24px;
     --border-radius-md: 16px;
     --transition-smooth: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    
+    /* Safe Area Variables */
+    --safeTop: 0px;
+    --safeBottom: 0px;
+    --safeLeft: 0px;
+    --safeRight: 0px;
 }
 
 html, body {
@@ -72,6 +78,7 @@ h1, h2, h3 {
     position: relative;
     margin-top: -40px;
     padding: 0 20px 100px;
+    padding-top: var(--safeTop);
     z-index: 10;
 }
 

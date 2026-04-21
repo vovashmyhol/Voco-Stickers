@@ -49,8 +49,8 @@ body {
     left: 0;
     width: 100%;
     height: 120px; /* Area of effect */
-    backdrop-filter: blur(4px); /* Much less blur as requested */
-    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(12px); /* Increased blur intensity as requested */
+    -webkit-backdrop-filter: blur(12px);
     /* Very smooth gradient transition for the blur effect */
     -webkit-mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
     mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
@@ -139,8 +139,10 @@ body {
 /* Collections Section */
 .collections-section {
     margin: 40px 15px 0 15px;
-    padding: 25px 0 0 0;
-    background: #112150; 
+    padding: 30px 0 0 0;
+    background: rgba(17, 33, 80, 0.8); /* Semi-transparent for blur visibility */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-radius: 35px;
     overflow: hidden;
     position: relative;
@@ -150,8 +152,23 @@ body {
     animation: fadeIn 1.2s ease-out forwards;
 }
 
+/* Liquid glass gradient border */
+.collections-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px; /* Border width */
+    border-radius: 35px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.15) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 2;
+}
+
 .section-title {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 500;
     margin-bottom: 20px;
     padding: 0 30px;

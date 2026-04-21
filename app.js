@@ -2,8 +2,9 @@
 const tg = window.Telegram.WebApp;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Expand the app to full screen
+    // 1. Expand the app to full screen and disable swipe-to-close behavior
     tg.expand();
+    tg.disableVerticalSwipes(); // Prevents free pulling down to close at the top
     
     // 2. Set Theme Colors
     tg.setHeaderColor('#0088cc'); // Using the Voco blue

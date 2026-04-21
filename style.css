@@ -20,6 +20,7 @@ body {
     color: var(--text-white);
     overflow-x: hidden;
     min-height: 100vh;
+    overscroll-behavior-y: contain; /* Prevents free pulling at the top/bottom */
 }
 
 #app {
@@ -40,9 +41,9 @@ body {
     transform: scale(1.1); /* Subtle scale for depth */
 }
 
-/* Scrolling Headroom - As requested */
+/* Scrolling Headroom - As requested (reduced by 1.5x) */
 .scroll-headroom {
-    height: 45vh; /* Large top margin for scrolling headroom */
+    height: 30vh; 
 }
 
 /* Header Content */

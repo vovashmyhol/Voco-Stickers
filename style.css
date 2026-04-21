@@ -41,9 +41,9 @@ body {
     transform: scale(1.1); /* Subtle scale for depth */
 }
 
-/* Scrolling Headroom - As requested (reduced by 1.5x) */
+/* Scrolling Headroom - Reduced further as requested */
 .scroll-headroom {
-    height: 30vh; 
+    height: 20vh; 
 }
 
 /* Header Content */
@@ -84,27 +84,33 @@ body {
 .brand-name {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 5px;
+    gap: 2px;
+    margin-bottom: 2px; /* Reduced from 5px */
 }
 
 .brand-name h1 {
     font-size: 2.5rem;
-    font-weight: 700;
+    font-weight: 600; /* Slightly less bold as requested */
     letter-spacing: 1px;
+    line-height: 1; /* Tighter line height */
 }
 
 .verify-badge {
-    width: 24px;
-    height: 24px;
+    width: 42px;
+    height: 42px;
 }
 
 .channel-link {
-    color: var(--primary-blue);
+    color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 400;
     transition: opacity 0.2s;
+}
+
+.channel-link span {
+    color: #40B3FF; /* Bright blue for the clickable part */
+    font-weight: 600;
 }
 
 .channel-link:active {
@@ -113,75 +119,68 @@ body {
 
 /* Collections Section */
 .collections-section {
-    margin-top: 40px;
-    padding: 20px;
-    background: var(--glass-background);
-    backdrop-filter: blur(20px);
-    border-radius: 30px 30px 0 0;
-    border-top: 1px solid var(--glass-border);
-    min-height: 100vh;
+    margin: 40px 15px 0 15px;
+    padding: 25px 0 0 0;
+    background: #112150; 
+    border-radius: 35px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 1.2s ease-out forwards;
 }
 
 .section-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 25px;
-    margin-left: 10px;
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+    padding: 0 30px;
+    color: white;
+    letter-spacing: 0.5px;
 }
 
 .collections-carousel {
     display: flex;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    gap: 20px;
-    padding-bottom: 20px;
-    scrollbar-width: none; /* Hide scrollbar Firefox */
+    gap: 0;
+    padding: 0 15px 25px 15px; 
+    scrollbar-width: none;
 }
 
 .collections-carousel::-webkit-scrollbar {
-    display: none; /* Hide scrollbar Chrome/Safari */
+    display: none;
 }
 
 .pack-card {
-    flex: 0 0 calc(100% - 20px);
+    flex: 0 0 100%;
     scroll-snap-align: center;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
+    background: #4b1f9c; 
+    border-radius: 25px; 
+    aspect-ratio: 3 / 2; /* Match the new image ratio */
     overflow: hidden;
     position: relative;
-    border: 1px solid var(--glass-border);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.pack-card:active {
-    transform: scale(0.96);
+    border: none;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pack-image {
     width: 100%;
-    aspect-ratio: 1;
+    height: 100%;
     object-fit: cover;
-}
-
-.pack-details {
-    padding: 15px;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.pack-price {
-    background: var(--primary-blue);
-    padding: 6px 15px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
+    display: block;
 }
 
 .carousel-dots {
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-top: 20px;
+    margin-top: 15px; /* Now outside the container */
+    margin-bottom: 100px; /* Spacer at the very bottom */
 }
 
 .dot {
@@ -194,8 +193,8 @@ body {
 
 .dot.active {
     background: var(--primary-blue);
-    transform: scale(1.2);
-    box-shadow: 0 0 10px var(--primary-blue);
+    transform: scale(1.1);
+    box-shadow: none; /* Removed glow effect */
 }
 
 /* Profile Button */

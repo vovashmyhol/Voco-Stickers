@@ -41,6 +41,22 @@ body {
     transform: scale(1.1); /* Subtle scale for depth */
 }
 
+/* Scroll-triggered Blur Overlay */
+.scroll-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 150px; /* How much it covers from the top */
+    background: linear-gradient(to bottom, rgba(5, 11, 26, 0.8) 0%, transparent 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-out;
+}
+
 /* Scrolling Headroom - Reduced further as requested */
 .scroll-headroom {
     height: 20vh; 
@@ -230,7 +246,7 @@ body {
 
 .pack-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 136, 204, 0.3);
+    box-shadow: none;
 }
 
 .profile-button {

@@ -15,10 +15,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 4. Carousel Scroll Handling
     initCarousel();
+
+    // 5. Scroll Overlay Handling (Blur effect on top)
+    initScrollEffect();
     
-    // 5. Telegram Main Button (not needed yet for main page, but ready)
+    // 6. Telegram Main Button
     tg.ready();
 });
+
+/**
+ * Handle top blur overlay on scroll
+ */
+function initScrollEffect() {
+    const overlay = document.getElementById('scrollOverlay');
+    window.addEventListener('scroll', () => {
+        const scrollPos = window.scrollY;
+        // Fade in over 100px of scroll
+        const opacity = Math.min(scrollPos / 100, 1);
+        overlay.style.opacity = opacity;
+    });
+}
 
 /**
  * Initialize User Data from Telegram

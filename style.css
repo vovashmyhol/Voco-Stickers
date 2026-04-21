@@ -47,14 +47,16 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    height: 150px; /* How much it covers from the top */
-    background: linear-gradient(to bottom, rgba(5, 11, 26, 0.8) 0%, transparent 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    height: 120px; /* Area of effect */
+    backdrop-filter: blur(4px); /* Much less blur as requested */
+    -webkit-backdrop-filter: blur(4px);
+    /* Very smooth gradient transition for the blur effect */
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
     z-index: 10;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease-out;
+    transition: opacity 0.3s ease-out;
 }
 
 /* Scrolling Headroom - Reduced further as requested */

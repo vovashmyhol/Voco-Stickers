@@ -1,115 +1,63 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VOCO Stickers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Voco Sticker Shop</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts: Inter and Outfit -->
+    <!-- Google Fonts for premium look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Lottie Player -->
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </head>
-<body class="dark-theme">
+<body>
     <div id="app">
-        <!-- Elastic Banner Section -->
-        <div class="banner-container" id="banner-container">
-            <img src="photo_2026-04-11_13-40-53.jpg" alt="VOCO Banner" id="elastic-banner">
-            <div class="banner-overlay"></div>
-        </div>
+        <!-- Background Layer -->
+        <div class="main-background"></div>
 
-        <div class="content-wrapper">
-            <!-- Profile Section -->
-            <header class="profile-section">
-                <div class="logo-wrapper">
-                    <div class="logo-container">
-                        <img src="voco_logo.jpg" alt="VOCO Logo" class="profile-logo">
-                    </div>
-                </div>
-                
-                <div class="profile-info">
-                    <div class="title-row">
-                        <h1 class="profile-name">VOCO</h1>
-                        <img src="verify.WEBP" alt="Verified" class="verify-badge">
-                    </div>
-                    <a href="https://t.me/voco_in" class="channel-link" target="_blank">by @voco_in</a>
-                </div>
-            </header>
+        <!-- Scrolling Headroom Spacer -->
+        <div class="scroll-headroom"></div>
 
-            <!-- Description -->
-            <section class="description-section">
-                <p>Эксклюзивные стикеры от VOCO. Коллекционируй, используй, выделяйся.</p>
-            </section>
-
-            <!-- Sticker Preview Carousel -->
-            <section class="carousel-section">
-                <div class="section-header">
-                    <h2 class="section-title">Доступные стикеры</h2>
-                </div>
-                <div class="carousel-container" id="sticker-carousel">
-                    <!-- Stickers will be added via JS or defined here -->
-                    <div class="sticker-card placeholder">
-                        <div class="sticker-placeholder-inner"></div>
-                    </div>
-                    <div class="sticker-card placeholder">
-                        <div class="sticker-placeholder-inner"></div>
-                    </div>
-                    <div class="sticker-card placeholder">
-                        <div class="sticker-placeholder-inner"></div>
-                    </div>
-                    <!-- "Show More" Trigger -->
-                    <div class="view-more-card" id="view-more-btn">
-                        <div class="view-more-inner">
-                            <span class="view-more-icon">+</span>
-                            <span>Еще</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- Purchase Modal (Slide-up Sheet) -->
-        <div class="modal-overlay" id="purchase-modal">
-            <div class="modal-blue-glow"></div>
-            <div class="modal-content">
-                <div class="modal-handle"></div>
-                <div class="modal-header">
-                    <button class="close-btn" id="close-modal">✕</button>
-                    <div class="modal-nav">
-                        <span>Стикеры</span>
-                        <div class="nav-dots">
-                             <span class="dot active"></span>
-                             <span class="dot"></span>
-                             <span class="dot"></span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="modal-body">
-                    <div class="selected-sticker-display">
-                        <div class="sticker-placeholder-large"></div>
-                        <h2 class="sticker-set-title">VOCO stickers</h2>
-                    </div>
-
-                    <div class="info-table">
-                        <div class="info-row">
-                            <span class="info-label">Owner</span>
-                            <span class="info-value">Volodymyr</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Price</span>
-                            <div class="info-value price-tag">
-                                <span>15</span>
-                                <img src="stars-DBKMczxe.png" alt="stars" class="star-icon">
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="buy-button">Open</button>
-                </div>
+        <!-- Header Content -->
+        <header class="main-header">
+            <div class="avatar-container">
+                <img src="voco_logo.jpg" alt="Voco Logo" class="profile-avatar">
             </div>
+            <div class="brand-info">
+                <div class="brand-name">
+                    <h1>VOCO</h1>
+                    <img src="verify.WEBP" alt="Verified" class="verify-badge">
+                </div>
+                <a href="https://t.me/voco_in" class="channel-link" target="_blank">by @voco_in</a>
+            </div>
+        </header>
+
+        <!-- Collections Section -->
+        <section class="collections-section">
+            <h2 class="section-title">Collections</h2>
+            <div class="collections-carousel" id="collectionsCarousel">
+                <div class="pack-card" id="vocoPack">
+                    <img src="Пак.JPEG" alt="Voco Pack" class="pack-image">
+                    <div class="pack-details">
+                        <span class="pack-price">1.00 TON</span>
+                    </div>
+                </div>
+                <!-- Future packs can be added here -->
+            </div>
+            <div class="carousel-dots">
+                <span class="dot active"></span>
+            </div>
+        </section>
+
+        <!-- Profile Navigation (Bottom Right) -->
+        <div class="profile-nav-container">
+            <button class="profile-button" id="profileBtn">
+                <img id="userPhoto" src="voco_logo.jpg" alt="Profile" class="user-avatar">
+            </button>
         </div>
     </div>
 

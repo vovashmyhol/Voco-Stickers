@@ -108,15 +108,15 @@ body {
 }
 
 .brand-name h1 {
-    font-size: 2.5rem;
+    font-size: 2.0rem;
     font-weight: 600; /* Slightly less bold as requested */
     letter-spacing: 1px;
     line-height: 1; /* Tighter line height */
 }
 
 .verify-badge {
-    width: 42px;
-    height: 42px;
+    width: 32px;
+    height: 32px;
 }
 
 .channel-link {
@@ -181,7 +181,7 @@ body {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     gap: 0;
-    padding: 0 15px 25px 15px; 
+    padding: 0 15px 12px 15px; /* Set to 12px for symmetry with the bottom padding */
     scrollbar-width: none;
 }
 
@@ -215,8 +215,7 @@ body {
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-top: 15px; /* Now outside the container */
-    margin-bottom: 100px; /* Spacer at the very bottom */
+    padding-bottom: 12px; /* Equal spacing for symmetry */
 }
 
 .dot {
@@ -316,12 +315,14 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-end;
+    opacity: 0; /* Added for iOS transition stability */
     visibility: hidden;
     pointer-events: none;
-    transition: background 0.3s ease, backdrop-filter 0.3s ease, visibility 0.3s ease;
+    transition: opacity 0.3s ease, background 0.3s ease, backdrop-filter 0.3s ease, visibility 0.3s ease;
 }
 
 .modal-overlay.active {
+    opacity: 1;
     visibility: visible;
     pointer-events: auto;
     background: rgba(0, 0, 0, 0.7);
@@ -336,7 +337,8 @@ body {
     position: relative;
     padding: 12px 20px 40px 20px;
     margin-bottom: 20px; /* Small gap from the bottom */
-    transform: translateY(110%); /* Slide from below the bottom margin */
+    transform: translate3d(0, 110%, 0); /* Using 3D for iPhone hardware acceleration */
+    will-change: transform;
     transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
     display: flex;
@@ -349,7 +351,7 @@ body {
 }
 
 .modal-overlay.active .modal-content {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
 }
 
 .modal-handle {

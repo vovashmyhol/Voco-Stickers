@@ -124,9 +124,13 @@ function openPackModal(packId) {
     
     // Reset any drag transforms before opening
     const modalContent = modal.querySelector('.modal-content');
-    modalContent.style.transform = '';
     modalContent.classList.remove('dragging');
     
+    // Force initial state for Safari/iPhone
+    modalContent.style.transform = 'translate3d(0, 110%, 0)';
+    void modalContent.offsetHeight; // Trigger reflow
+    
+    modalContent.style.transform = ''; // Let CSS transition take over
     modal.classList.add('active');
     
     // Impact feedback

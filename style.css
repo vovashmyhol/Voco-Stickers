@@ -213,6 +213,23 @@ body {
     display: block;
 }
 
+.pack-supply-tag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #4b1f9c61;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    z-index: 10;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    letter-spacing: 0.5px;
+}
+
 .carousel-dots {
     display: flex;
     justify-content: center;

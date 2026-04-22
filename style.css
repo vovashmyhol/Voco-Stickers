@@ -301,3 +301,263 @@ body {
         justify-content: center;
     }
 }
+
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    visibility: hidden;
+    pointer-events: none;
+    transition: background 0.3s ease, backdrop-filter 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active {
+    visibility: visible;
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+}
+
+.modal-content {
+    width: calc(100% - 20px); /* Side margins for a 'floating' look */
+    max-height: 94vh;
+    background: #1c1c1e; /* Solid iOS Dark Gray */
+    border-radius: 45px; /* Increased for a smoother, bubble-like look */
+    position: relative;
+    padding: 12px 20px 40px 20px;
+    margin-bottom: 20px; /* Small gap from the bottom */
+    transform: translateY(110%); /* Slide from below the bottom margin */
+    transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+/* For smooth dragging */
+.modal-content.dragging {
+    transition: none;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-handle {
+    width: 36px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    margin: 0 auto 15px auto;
+    position: relative;
+}
+
+/* Larger hit area for the handle */
+.modal-handle::after {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -20px;
+    right: -20px;
+    bottom: -15px;
+}
+
+.modal-top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    margin-bottom: 20px;
+    padding: 0 4px; /* Slight horizontal padding for the buttons */
+}
+
+.modal-close-small {
+    background: rgba(44, 44, 46, 0.7); /* More transparent background */
+    backdrop-filter: blur(8px); /* Added blur for glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Solid border maintained */
+    color: white;
+    width: 40px; /* Kept larger diameter */
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.modal-close-small:active {
+    background: #3a3a3c;
+}
+
+.modal-top-right {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-nav-icon {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-header-centered {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-main-label {
+    color: white;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.slider-dots-mini {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.m-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.m-dot.active {
+    background: white;
+    width: 18px; /* Capsule shape exactly like photo */
+    height: 7px;
+    border-radius: 10px;
+}
+
+.pack-preview-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.lottie-slider {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.lottie-slider::-webkit-scrollbar {
+    display: none;
+}
+
+.lottie-slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.lottie-slide lottie-player {
+    width: 250px;
+    height: 250px;
+}
+
+.pack-title-bold {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 25px;
+    color: white;
+    letter-spacing: -0.5px;
+}
+
+/* Info Card Style - Exactly like photo */
+.info-card {
+    background: #2c2c2e;
+    border-radius: 20px; /* Adjusted to be more 'neat' like the photo */
+    padding: 4px 20px; /* Increased horizontal padding */
+    margin-bottom: 35px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0; /* Slightly more vertical breathing room */
+}
+
+.info-label {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.info-value {
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.info-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06); /* Very subtle divider */
+    width: 100%;
+}
+
+.price-stars {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.star-icon-img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+/* Premium Button - iOS Blue */
+.premium-action-button {
+    width: 96%;
+    margin: 0 auto;
+    padding: 16px;
+    border-radius: 100px; /* Pill shape exactly like photo */
+    background: #3082F6; /* iOS 18+ Vibrant Blue */
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4); /* Subtile top inner glow */
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: -0.5px;
+}
+
+.premium-action-button:active {
+    transform: scale(0.96);
+    background: #0071e3;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}

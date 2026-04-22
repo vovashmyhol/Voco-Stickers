@@ -60,6 +60,63 @@
                 <img id="userPhoto" src="voco_logo.jpg" alt="Profile" class="user-avatar">
             </button>
         </div>
+
+        <!-- Detailed Pack Modal -->
+        <div id="packModal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-handle"></div>
+                
+                <div class="modal-top-nav">
+                    <button class="modal-close-small" id="closeModal">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                    <div class="modal-header-centered">
+                        <div class="slider-dots-mini" id="modalDots">
+                            <span class="m-dot active"></span>
+                            <span class="m-dot"></span>
+                            <span class="m-dot"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-body">
+                    <div class="pack-preview-area">
+                        <div class="lottie-slider" id="lottieSlider">
+                            <div class="lottie-slide">
+                                <lottie-player src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Artboard%201%20(3).json" background="transparent" speed="1" loop autoplay></lottie-player>
+                            </div>
+                            <div class="lottie-slide">
+                                <lottie-player src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Artboard%201%20(3).json" background="transparent" speed="1" loop autoplay></lottie-player>
+                            </div>
+                            <div class="lottie-slide">
+                                <lottie-player src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Artboard%201%20(3).json" background="transparent" speed="1" loop autoplay></lottie-player>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2 class="pack-title-bold">The Pack</h2>
+                    
+                    <div class="info-card">
+                        <div class="info-row">
+                            <span class="info-label">Supply</span>
+                            <span class="info-value" id="supplyValue">333 of 333</span>
+                        </div>
+                        <div class="info-divider"></div>
+                        <div class="info-row">
+                            <span class="info-label">Price</span>
+                            <div class="info-value price-stars">
+                                <span id="priceValue">15</span>
+                                <img src="stars-DBKMczxe.png" alt="Stars" class="star-icon-img">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="premium-action-button" id="buyBtn">Get</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>

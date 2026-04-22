@@ -49,6 +49,7 @@ body {
     left: 0;
     width: 100%;
     height: 120px; /* Area of effect */
+    background: rgba(0, 0, 0, 0.3); /* Added slight darkening as requested */
     backdrop-filter: blur(12px); /* Increased blur intensity as requested */
     -webkit-backdrop-filter: blur(12px);
     /* Very smooth gradient transition for the blur effect */
@@ -150,6 +151,7 @@ body {
     flex-direction: column;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
     animation: fadeIn 1.2s ease-out forwards;
+    margin-bottom: 100px; /* Restored the bottom spacer as it was previously */
 }
 
 /* Liquid glass gradient border */

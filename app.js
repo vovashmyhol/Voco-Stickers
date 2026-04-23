@@ -367,17 +367,18 @@ function updateModalUI(packId, context = 'market') {
 
     console.log('Updating Modal UI for:', packId, 'Context:', context);
 
+    // Always show market info (Price & Supply)
+    if (marketInfo) marketInfo.style.display = 'block';
+    if (priceValue) priceValue.textContent = '15';
+
     if (context === 'profile') {
-        marketInfo.style.display = 'none';
-        ownerInfo.style.display = 'block';
+        // In profile, also show owner info and change button to Open
+        if (ownerInfo) ownerInfo.style.display = 'block';
         buyBtn.textContent = 'Open';
     } else {
-        marketInfo.style.display = 'block';
-        ownerInfo.style.display = 'none';
-        
-        // Always show as 'Get' in market to allow multiple purchases
+        // In market, hide owner info and set button to Get
+        if (ownerInfo) ownerInfo.style.display = 'none';
         buyBtn.textContent = 'Get';
-        if (priceValue) priceValue.textContent = '15';
     }
 }
  

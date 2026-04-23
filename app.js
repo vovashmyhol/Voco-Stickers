@@ -48,9 +48,35 @@ function initScrollEffect() {
 function initUserData() {
     const user = tg.initDataUnsafe?.user;
     const userPhotoImg = document.getElementById('userPhoto');
+    const userPhotoLarge = document.getElementById('userPhotoLarge');
+    const userName = document.getElementById('userName');
+    const userId = document.getElementById('userId');
+    const ownerName = document.getElementById('ownerName');
     
-    if (user && user.photo_url) {
-        userPhotoImg.src = user.photo_url;
+    if (user) {
+        if (user.photo_url) {
+            userPhotoImg.src = user.photo_url;
+            userPhotoLarge.src = user.photo_url;
+        }
+        
+        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User';
+        userName.textContent = fullName;
+        ownerName.textContent = fullName;
+        userId.textContent = user.id || 'Unknown';
+        
+        // Handle Copy ID
+        document.getElementById('copyId').addEventListener('click', () => {
+            if (user.id) {
+                const idStr = user.id.toString();
+                navigator.clipboard.writeText(idStr).then(() => {
+                    tg.HapticFeedback.notificationOccurred('success');
+                    // Simple temporary visual feedback
+                    const originalText = userId.textContent;
+                    userId.textContent = 'Copied!';
+                    setTimeout(() => userId.textContent = originalText, 1000);
+                });
+            }
+        });
     }
 }
  
@@ -92,13 +118,103 @@ document.getElementById('vocoPack').addEventListener('click', () => {
     openPackModal('VocoX');
 });
  
-// 2. Profile button (Showcase Inventory)
+// 2. Profile button (Show Profile View)
 document.getElementById('profileBtn').addEventListener('click', () => {
     tg.HapticFeedback.impactOccurred('medium');
-    openPackModal('VocoX'); 
+    openProfile();
 });
- 
-// 3. Modal Close
+
+function openProfile() {
+    renderInventory();
+    const profileView = document.getElementById('profileView');
+    profileView.classList.add('active');
+    updateBackButton();
+    initProfileElasticScroll(profileView);
+}
+
+function initProfileElasticScroll(profileView) {
+    const headerBg = document.getElementById('profileHeaderBg');
+    const starsBg = document.getElementById('profileStarsBg');
+    
+    profileView.onscroll = () => {
+        const scrollTop = profileView.scrollTop;
+        
+        if (scrollTop < 0) {
+            // Pulling down (Overscroll)
+            const scale = 1 + Math.abs(scrollTop) / 500;
+            const translate = Math.abs(scrollTop) / 2;
+            headerBg.style.transform = `scale(${scale}) translateY(${translate}px)`;
+            starsBg.style.transform = `scale(${scale}) translateY(${translate}px)`;
+        } else {
+            // Normal scrolling (Parallax)
+            const translate = scrollTop * 0.4;
+            headerBg.style.transform = `translateY(${-translate}px)`;
+            starsBg.style.transform = `translateY(${-translate}px)`;
+        }
+    };
+}
+
+function closeProfile() {
+    document.getElementById('profileView').classList.remove('active');
+    updateBackButton();
+}
+
+/**
+ * Global navigation handler for Telegram BackButton
+ */
+function updateBackButton() {
+    const isProfileActive = document.getElementById('profileView').classList.contains('active');
+    const isModalActive = modal.classList.contains('active');
+
+    if (isProfileActive || isModalActive) {
+        tg.BackButton.show();
+        tg.BackButton.offClick(handleBackAction); // Prevent duplicate listeners
+        tg.BackButton.onClick(handleBackAction);
+    } else {
+        tg.BackButton.hide();
+    }
+}
+
+function handleBackAction() {
+    const isModalActive = modal.classList.contains('active');
+    const isProfileActive = document.getElementById('profileView').classList.contains('active');
+
+    if (isModalActive) {
+        closeModal();
+    } else if (isProfileActive) {
+        closeProfile();
+    }
+}
+
+function renderInventory() {
+    const grid = document.getElementById('inventoryGrid');
+    const packCount = document.getElementById('packCount');
+    grid.innerHTML = '';
+    
+    packCount.textContent = inventory.length;
+
+    inventory.forEach(packId => {
+        // Mock item structure for the profile grid
+        const item = document.createElement('div');
+        item.className = 'inventory-item';
+        item.innerHTML = `
+            <img src="Пак.JPEG" alt="Sticker" class="inventory-sticker-img">
+            <div class="inventory-item-price">
+                <span>15</span>
+                <img src="stars-DBKMczxe.png" alt="Stars">
+            </div>
+            <div class="inventory-item-name">The Pack</div>
+        `;
+        
+        item.onclick = () => {
+            openPackModal(packId, 'profile');
+        };
+        
+        grid.appendChild(item);
+    });
+}
+
+// 4. Modal Close
 document.getElementById('closeModal').addEventListener('click', () => {
     closeModal();
 });
@@ -119,8 +235,8 @@ if (lottieSlider) {
     };
 }
  
-function openPackModal(packId) {
-    updateModalUI(packId);
+function openPackModal(packId, context = 'market') {
+    updateModalUI(packId, context);
     
     // Reset any drag transforms before opening
     const modalContent = modal.querySelector('.modal-content');
@@ -132,6 +248,7 @@ function openPackModal(packId) {
     
     modalContent.style.transform = ''; // Let CSS transition take over
     modal.classList.add('active');
+    updateBackButton();
     
     // Impact feedback
     if (tg.HapticFeedback) {
@@ -141,6 +258,7 @@ function openPackModal(packId) {
  
 function closeModal() {
     modal.classList.remove('active');
+    updateBackButton();
     if (tg.HapticFeedback) {
         tg.HapticFeedback.impactOccurred('light');
     }
@@ -217,15 +335,26 @@ function initModalGestures() {
     modalContent.addEventListener('touchcancel', handleRelease);
 }
  
-function updateModalUI(packId) {
+function updateModalUI(packId, context) {
     const isOwned = inventory.includes(packId);
- 
-    if (isOwned) {
+    const marketInfo = document.getElementById('marketInfo');
+    const ownerInfo = document.getElementById('ownerInfo');
+
+    if (context === 'profile') {
+        marketInfo.style.display = 'none';
+        ownerInfo.style.display = 'block';
         buyBtn.textContent = 'Open';
-        priceValue.textContent = 'Owned';
     } else {
-        buyBtn.textContent = 'Get';
-        priceValue.textContent = '15';
+        marketInfo.style.display = 'block';
+        ownerInfo.style.display = 'none';
+        
+        if (isOwned) {
+            buyBtn.textContent = 'Open';
+            priceValue.textContent = 'Owned';
+        } else {
+            buyBtn.textContent = 'Get';
+            priceValue.textContent = '15';
+        }
     }
 }
  

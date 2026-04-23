@@ -582,3 +582,196 @@ body {
     background: #0071e3;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+/* Profile Page Styles */
+.profile-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1c1c1e; /* Grey background matching modal */
+    z-index: 1500;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    overflow-y: auto;
+}
+
+/* Starry Blue Header Area */
+.profile-header-bg {
+    position: absolute;
+    top: -50px;
+    left: 0;
+    width: 100%;
+    height: 450px; 
+    background: radial-gradient(circle at 50% 0%, #1a3a8a 0%, #050b1a 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    z-index: 0;
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+}
+
+/* Stars for the blue area */
+.profile-stars-bg {
+    position: absolute;
+    top: -50px;
+    left: 0;
+    width: 100%;
+    height: 450px;
+    background-image: 
+        radial-gradient(1.5px 1.5px at 20px 30px, white, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 40px 70px, white, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 150px 40px, white, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 280px 120px, white, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 100px 150px, white, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 200px 250px, white, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 320px 50px, white, rgba(0,0,0,0));
+    background-size: 350px 350px;
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 1;
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+}
+
+.profile-page.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.profile-content {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    padding: 100px 20px 100px 20px; /* Significant top padding for the 'Закрыть' button area */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-main-info {
+    text-align: center;
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.profile-avatar-large {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 20px auto;
+    border: none;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    background: #2c2c2e;
+    position: relative;
+}
+
+.profile-avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-name-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: white;
+}
+
+.user-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+}
+
+.user-id-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.user-id-container:active {
+    color: white;
+}
+
+/* Inventory Grid */
+.inventory-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 0 5px;
+}
+
+.inventory-item {
+    background: #1c1c1e; /* Card background from photo */
+    border-radius: 20px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    aspect-ratio: 1 / 1.45;
+    transition: transform 0.2s;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.inventory-item:active {
+    transform: scale(0.96);
+}
+
+.inventory-sticker-img {
+    width: 85%;
+    height: auto;
+    margin-bottom: 12px;
+}
+
+.inventory-item-price {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.inventory-item-price img {
+    width: 18px;
+    height: 18px;
+}
+
+.inventory-item-name {
+    font-size: 0.7rem;
+    color: white;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: auto;
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Simulate futuristic font if possible */
+    font-family: 'Orbitron', sans-serif; 
+}

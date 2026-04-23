@@ -361,7 +361,7 @@ function initModalGestures() {
  
 function updateModalUI(packId, context = 'market') {
     const marketInfo = document.getElementById('marketInfo');
-    const ownerInfo = document.getElementById('ownerInfo');
+    const ownerRow = document.getElementById('ownerRow');
     const buyBtn = document.getElementById('buyBtn');
     const priceValue = document.getElementById('priceValue');
 
@@ -372,12 +372,12 @@ function updateModalUI(packId, context = 'market') {
     if (priceValue) priceValue.textContent = '15';
 
     if (context === 'profile') {
-        // In profile, also show owner info and change button to Open
-        if (ownerInfo) ownerInfo.style.display = 'block';
+        // In profile, also show owner row inside the card and change button to Open
+        if (ownerRow) ownerRow.style.display = 'block';
         buyBtn.textContent = 'Open';
     } else {
-        // In market, hide owner info and set button to Get
-        if (ownerInfo) ownerInfo.style.display = 'none';
+        // In market, hide owner row and set button to Get
+        if (ownerRow) ownerRow.style.display = 'none';
         buyBtn.textContent = 'Get';
     }
 }

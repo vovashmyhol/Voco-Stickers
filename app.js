@@ -194,14 +194,16 @@ function renderInventory() {
     packCount.textContent = inventory.length;
 
     inventory.forEach(packId => {
-        // Mock item structure for the profile grid
         const item = document.createElement('div');
         item.className = 'inventory-item';
         item.innerHTML = `
-            <img src="Пак.JPEG" alt="Sticker" class="inventory-sticker-img">
-            <div class="inventory-item-price">
-                <span>15</span>
-                <img src="stars-DBKMczxe.png" alt="Stars">
+            <div class="inventory-sticker-container">
+                <lottie-player 
+                    src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Artboard%201%20(3).json" 
+                    background="transparent" 
+                    speed="1" 
+                    style="width: 100%; height: 100%;">
+                </lottie-player>
             </div>
             <div class="inventory-item-name">The Pack</div>
         `;
@@ -369,7 +371,8 @@ buyBtn.addEventListener('click', () => {
         // Specific Invoice URL provided by user
         const invoiceUrl = 'https://t.me/$j4ADo8xWMEtDFgAAl_xEVL2lLAU';
         
-        if (tg.openInvoice) {
+        // Check if we are inside Telegram and invoices are supported
+        if (tg.initData && tg.openInvoice) {
             tg.openInvoice(invoiceUrl, (status) => {
                 // status can be 'paid', 'cancelled', 'failed', 'pending'
                 if (status === 'paid' || status === 'pending') {
@@ -377,10 +380,13 @@ buyBtn.addEventListener('click', () => {
                 }
             });
         } else {
-            // Mock payment for Browser/Development
-            if (confirm('Simulate successful payment for 15 Stars?')) {
-                confirmPurchase('VocoX');
-            }
+            // Browser Mode: Grant for free
+            tg.showPopup({
+                title: 'Browser Mode',
+                message: 'In browser mode, sticker packs are available for free!',
+                buttons: [{type: 'ok'}]
+            });
+            confirmPurchase('VocoX');
         }
     }
 });

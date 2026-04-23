@@ -155,7 +155,8 @@ function initProfileElasticScroll(profileView) {
 }
 
 function closeProfile() {
-    document.getElementById('profileView').classList.remove('active');
+    const profileView = document.getElementById('profileView');
+    if (profileView) profileView.classList.remove('active');
     updateBackButton();
 }
 
@@ -163,12 +164,15 @@ function closeProfile() {
  * Global navigation handler for Telegram BackButton
  */
 function updateBackButton() {
-    const isProfileActive = document.getElementById('profileView').classList.contains('active');
-    const isModalActive = modal.classList.contains('active');
+    const profileView = document.getElementById('profileView');
+    const modalEl = document.getElementById('packModal');
+    
+    const isProfileActive = profileView && profileView.classList.contains('active');
+    const isModalActive = modalEl && modalEl.classList.contains('active');
 
     if (isProfileActive || isModalActive) {
         tg.BackButton.show();
-        tg.BackButton.offClick(handleBackAction); // Prevent duplicate listeners
+        tg.BackButton.offClick(handleBackAction); 
         tg.BackButton.onClick(handleBackAction);
     } else {
         tg.BackButton.hide();
@@ -176,8 +180,11 @@ function updateBackButton() {
 }
 
 function handleBackAction() {
-    const isModalActive = modal.classList.contains('active');
-    const isProfileActive = document.getElementById('profileView').classList.contains('active');
+    const modalEl = document.getElementById('packModal');
+    const profileView = document.getElementById('profileView');
+    
+    const isModalActive = modalEl && modalEl.classList.contains('active');
+    const isProfileActive = profileView && profileView.classList.contains('active');
 
     if (isModalActive) {
         closeModal();
@@ -239,28 +246,42 @@ if (lottieSlider) {
 }
  
 function openPackModal(packId, context = 'market') {
+    const modalEl = document.getElementById('packModal');
+    if (!modalEl) {
+        console.error('Modal element not found!');
+        return;
+    }
+    
     updateModalUI(packId, context);
     
-    // Reset any drag transforms before opening
-    const modalContent = modal.querySelector('.modal-content');
+    const modalContent = modalEl.querySelector('.modal-content');
     modalContent.classList.remove('dragging');
     
-    // Force initial state for Safari/iPhone
-    modalContent.style.transform = 'translate3d(0, 110%, 0)';
-    void modalContent.offsetHeight; // Trigger reflow
-    
-    modalContent.style.transform = ''; // Let CSS transition take over
-    modal.classList.add('active');
-    updateBackButton();
-    
-    // Impact feedback
+    // Impact feedback first
     if (tg.HapticFeedback) {
         tg.HapticFeedback.impactOccurred('medium');
     }
+
+    // Show the modal
+    modalEl.classList.add('active');
+    
+    // Reset transform to ensure it's visible
+    modalContent.style.transform = 'translate3d(0, 0, 0)';
+    
+    updateBackButton();
 }
  
 function closeModal() {
-    modal.classList.remove('active');
+    const modalEl = document.getElementById('packModal');
+    if (!modalEl) return;
+    
+    modalEl.classList.remove('active');
+    
+    const modalContent = modalEl.querySelector('.modal-content');
+    if (modalContent) {
+        modalContent.style.transform = 'translate3d(0, 110%, 0)';
+    }
+    
     updateBackButton();
     if (tg.HapticFeedback) {
         tg.HapticFeedback.impactOccurred('light');
@@ -338,10 +359,13 @@ function initModalGestures() {
     modalContent.addEventListener('touchcancel', handleRelease);
 }
  
-function updateModalUI(packId, context) {
-    const isOwned = inventory.includes(packId);
+function updateModalUI(packId, context = 'market') {
     const marketInfo = document.getElementById('marketInfo');
     const ownerInfo = document.getElementById('ownerInfo');
+    const buyBtn = document.getElementById('buyBtn');
+    const priceValue = document.getElementById('priceValue');
+
+    console.log('Updating Modal UI for:', packId, 'Context:', context);
 
     if (context === 'profile') {
         marketInfo.style.display = 'none';
@@ -351,52 +375,41 @@ function updateModalUI(packId, context) {
         marketInfo.style.display = 'block';
         ownerInfo.style.display = 'none';
         
-        if (isOwned) {
-            buyBtn.textContent = 'Open';
-            priceValue.textContent = 'Owned';
-        } else {
-            buyBtn.textContent = 'Get';
-            priceValue.textContent = '15';
-        }
+        // Always show as 'Get' in market to allow multiple purchases
+        buyBtn.textContent = 'Get';
+        if (priceValue) priceValue.textContent = '15';
     }
 }
  
 // 5. Purchase Logic
-buyBtn.addEventListener('click', () => {
-    const isOwned = inventory.includes('VocoX');
+document.getElementById('buyBtn').addEventListener('click', () => {
+    // If we are in profile view, 'buyBtn' acts as 'Open'
+    const isProfileActive = document.getElementById('profileView').classList.contains('active');
     
-    if (isOwned) {
+    if (isProfileActive) {
         // Open the sticker set
         tg.openTelegramLink('https://t.me/addstickers/VocoX');
     } else {
-        // Specific Invoice URL provided by user
+        // Market Mode: Purchase flow
         const invoiceUrl = 'https://t.me/$j4ADo8xWMEtDFgAAl_xEVL2lLAU';
         
-        // Check if we are inside Telegram and invoices are supported
         if (tg.initData && tg.openInvoice) {
             tg.openInvoice(invoiceUrl, (status) => {
-                // status can be 'paid', 'cancelled', 'failed', 'pending'
                 if (status === 'paid' || status === 'pending') {
                     confirmPurchase('VocoX');
                 }
             });
         } else {
             // Browser Mode: Grant for free
-            tg.showPopup({
-                title: 'Browser Mode',
-                message: 'In browser mode, sticker packs are available for free!',
-                buttons: [{type: 'ok'}]
-            });
             confirmPurchase('VocoX');
         }
     }
 });
  
 function confirmPurchase(packId) {
-    if (!inventory.includes(packId)) {
-        inventory.push(packId);
-        localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
-    }
+    inventory.push(packId);
+    localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+    
     tg.HapticFeedback.notificationOccurred('success');
-    updateModalUI(packId);
+    updateModalUI(packId, 'market');
 }

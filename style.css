@@ -746,6 +746,7 @@ body {
     align-items: center;
     justify-content: center;
     margin-bottom: 8px;
+    pointer-events: none;
 }
 
 .inventory-item-price {
@@ -776,4 +777,5 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     font-family: var(--font-main); 
+    pointer-events: none;
 }

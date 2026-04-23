@@ -208,9 +208,10 @@ function renderInventory() {
             <div class="inventory-item-name">The Pack</div>
         `;
         
-        item.onclick = () => {
+        item.addEventListener('click', () => {
+            console.log('Opening modal for pack:', packId); // Debug log
             openPackModal(packId, 'profile');
-        };
+        });
         
         grid.appendChild(item);
     });

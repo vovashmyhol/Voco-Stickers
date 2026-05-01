@@ -1,24 +1,47 @@
 // Initialize Telegram WebApp
 const tg = window.Telegram?.WebApp || {};
 
-// Splash screen: show for at least 1500ms, then fade out
+// Splash screen logic: wait for both minimum time AND full page load
+let minTimeElapsed = false;
+let pageLoaded = false;
+
 function hideSplash() {
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
     if (!splash) return;
     
     splash.classList.add('hidden');
-    // Remove skeleton loading state
     if (app) app.classList.remove('is-loading');
 
-    // Remove from DOM after transition finishes (fallback: remove after 600ms)
     const cleanup = () => splash.remove();
     splash.addEventListener('transitionend', cleanup, { once: true });
     setTimeout(cleanup, 600);
 }
 
-// Hard fallback: hide splash no matter what (even if DOMContentLoaded fails)
-setTimeout(hideSplash, 3000);
+function checkSplashStatus() {
+    if (minTimeElapsed && pageLoaded) {
+        hideSplash();
+    }
+}
+
+// Minimum display time (1600ms)
+setTimeout(() => {
+    minTimeElapsed = true;
+    checkSplashStatus();
+}, 1600);
+
+// Full page load event
+window.addEventListener('load', () => {
+    pageLoaded = true;
+    checkSplashStatus();
+});
+
+// Fallback: Force hide after 5 seconds no matter what
+setTimeout(() => {
+    if (!document.getElementById('splashScreen')?.classList.contains('hidden')) {
+        hideSplash();
+    }
+}, 5000);
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Expand the app and request immersive fullscreen
@@ -32,23 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Telegram SDK not available:', e);
     }
     
-    // 2. Initialize User Data
     initUserData();
-    
-    // 3. Carousel Scroll Handling
     initCarousel();
- 
-    // 4. Scroll Overlay Handling (Blur effect on top)
     initScrollEffect();
- 
-    // 5. Modal Gestures (Swipe to close)
     initModalGestures();
     
-    // 6. Telegram ready signal
     try { if (tg.ready) tg.ready(); } catch (e) {}
-
-    // 7. Hide splash after minimum display time (1500ms = ~1 pulse cycle)
-    setTimeout(hideSplash, 1500);
 });
  
 /**
@@ -416,6 +428,7 @@ function updateModalUI(packId, context = 'market') {
     const ownerRow = document.getElementById('ownerRow');
     const buyBtn = document.getElementById('buyBtn');
     const priceValue = document.getElementById('priceValue');
+    const extraActions = document.getElementById('extraActions');
 
     console.log('Updating Modal UI for:', packId, 'Context:', context);
 
@@ -427,10 +440,14 @@ function updateModalUI(packId, context = 'market') {
         // In profile, also show owner row inside the card and change button to Open
         if (ownerRow) ownerRow.style.display = 'block';
         buyBtn.textContent = 'Open';
+        buyBtn.classList.add('btn-small');
+        if (extraActions) extraActions.style.display = 'flex';
     } else {
         // In market, hide owner row and set button to Get
         if (ownerRow) ownerRow.style.display = 'none';
         buyBtn.textContent = 'Get';
+        buyBtn.classList.remove('btn-small');
+        if (extraActions) extraActions.style.display = 'none';
     }
 }
  

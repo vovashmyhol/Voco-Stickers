@@ -576,10 +576,51 @@ body {
     object-fit: contain;
 }
 
+.modal-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.extra-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.modal-action-circle {
+    background: linear-gradient(rgba(28, 28, 30, 0.7), rgba(28, 28, 30, 0.7)) padding-box,
+                linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) border-box;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid transparent;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-action-circle img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+}
+
+.modal-action-circle.disabled {
+    opacity: 0.4;
+    filter: grayscale(1);
+    cursor: default;
+    pointer-events: none;
+}
+
 /* Premium Button - iOS Blue */
 .premium-action-button {
-    width: 96%;
-    margin: 0 auto;
+    flex: 1; /* Take remaining space */
     padding: 16px;
     border-radius: 100px; /* Pill shape exactly like photo */
     background: #3082F6; /* iOS 18+ Vibrant Blue */
@@ -589,11 +630,17 @@ body {
     border: none;
     cursor: pointer;
     box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4); /* Subtile top inner glow */
-    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
     letter-spacing: -0.5px;
+}
+
+.premium-action-button.btn-small {
+    /* When small, we can keep flex: 1 but it will be constrained by the container's gap and other items */
+    font-size: 1.1rem;
+    padding: 14px;
 }
 
 .premium-action-button:active {
@@ -927,11 +974,49 @@ body {
     position: fixed;
     inset: 0;
     z-index: 9999;
-    background: #1c1c1e;
+    background: radial-gradient(circle at 50% 50%, #1a3a8a 0%, #050b1a 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: opacity 0.5s ease, visibility 0.5s ease;
+    overflow: hidden;
+}
+
+/* Stars for Splash Screen - matching profile style */
+.splash-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(1px 1px at 10% 10%, white, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 20% 35%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 35% 20%, white, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50% 15%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 70% 25%, white, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 85% 10%, white, rgba(0,0,0,0)),
+        radial-gradient(1.2px 1.2px at 90% 40%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 15% 60%, white, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 30% 75%, white, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 45% 65%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 60% 85%, white, rgba(0,0,0,0)),
+        radial-gradient(1.8px 1.8px at 75% 55%, white, rgba(0,0,0,0)),
+        radial-gradient(1.2px 1.2px at 85% 80%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 95% 65%, white, rgba(0,0,0,0));
+    background-size: 100% 100%;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+/* Nebula glow behind the logo */
+.splash-screen::after {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(64, 179, 255, 0.15) 0%, transparent 70%);
+    filter: blur(40px);
+    z-index: 2;
+    pointer-events: none;
 }
 
 .splash-screen.hidden {
@@ -942,6 +1027,7 @@ body {
 
 /* Lottie container */
 .splash-logo-wrap {
+    z-index: 3;
     width: 250px;
     height: 250px;
     display: flex;

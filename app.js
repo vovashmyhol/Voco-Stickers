@@ -4,8 +4,13 @@ const tg = window.Telegram?.WebApp || {};
 // Splash screen: show for at least 1500ms, then fade out
 function hideSplash() {
     const splash = document.getElementById('splashScreen');
+    const app = document.getElementById('app');
     if (!splash) return;
+    
     splash.classList.add('hidden');
+    // Remove skeleton loading state
+    if (app) app.classList.remove('is-loading');
+
     // Remove from DOM after transition finishes (fallback: remove after 600ms)
     const cleanup = () => splash.remove();
     splash.addEventListener('transitionend', cleanup, { once: true });

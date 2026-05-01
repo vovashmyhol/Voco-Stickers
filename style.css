@@ -412,22 +412,32 @@ body {
 }
 
 .modal-close-small {
-    background: rgba(44, 44, 46, 0.7); /* More transparent background */
-    backdrop-filter: blur(8px); /* Added blur for glass effect */
-    border: 1px solid rgba(255, 255, 255, 0.2); /* Solid border maintained */
+    background: linear-gradient(rgba(28, 28, 30, 0.7), rgba(28, 28, 30, 0.7)) padding-box,
+                linear-gradient(135deg, rgba(64, 179, 255, 0.5), rgba(64, 179, 255, 0.1) 50%, rgba(255, 255, 255, 0.2)) border-box;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid transparent;
     color: white;
-    width: 40px; /* Kept larger diameter */
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.modal-close-small svg {
+    stroke: rgba(64, 179, 255, 0.9);
 }
 
 .modal-close-small:active {
-    background: #3a3a3c;
+    transform: scale(0.9);
+    background: linear-gradient(rgba(64, 179, 255, 0.2), rgba(64, 179, 255, 0.2)) padding-box,
+                linear-gradient(135deg, rgba(64, 179, 255, 0.5), rgba(64, 179, 255, 0.5)) border-box;
+    opacity: 0.7;
 }
 
 .modal-top-right {
@@ -727,6 +737,7 @@ body {
 .stat-item {
     display: flex;
     align-items: center;
+    gap: 5px;
 }
 
 .user-id-container {
@@ -807,6 +818,109 @@ body {
     font-family: var(--font-main); 
     pointer-events: none;
 }
+
+/* Empty State Styling */
+.inventory-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+    text-align: center;
+    width: 100%;
+}
+
+.empty-lottie-container {
+    width: 180px;
+    height: 180px;
+    margin-bottom: 10px;
+}
+
+.empty-text {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 25px;
+}
+
+.go-market-btn {
+    background: linear-gradient(#1c1c1e, #1c1c1e) padding-box,
+                linear-gradient(135deg, rgba(64, 179, 255, 0.4) 0%, rgba(64, 179, 255, 0.05) 50%, rgba(0, 136, 204, 0.4) 100%) border-box;
+    color: rgba(64, 179, 255, 0.8);
+    border: 1.5px solid transparent;
+    padding: 10px 24px;
+    border-radius: 100px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.go-market-btn:active {
+    transform: scale(0.96);
+    background: linear-gradient(135deg, rgba(64, 179, 255, 0.2), rgba(0, 136, 204, 0.2)) padding-box,
+                linear-gradient(135deg, rgba(64, 179, 255, 0.3), rgba(0, 136, 204, 0.3)) border-box;
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 0.7;
+}
+
+/* ===== Skeleton Loaders ===== */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.05) 25%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.05) 75%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.5s infinite linear;
+    border-radius: 12px;
+}
+
+@keyframes skeletonShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.skeleton-text {
+    height: 14px;
+    margin-bottom: 8px;
+    width: 80%;
+}
+
+.skeleton-circle {
+    border-radius: 50%;
+}
+
+.skeleton-card {
+    border-radius: 25px;
+    aspect-ratio: 3 / 2;
+    width: 100%;
+}
+
+.skeleton-inventory {
+    border-radius: 20px;
+    aspect-ratio: 1 / 1.45;
+    width: 100%;
+}
+
+/* State management for skeletons */
+.is-loading .skeleton-target {
+    display: none !important;
+}
+
+.is-loading .skeleton-placeholder {
+    display: block !important;
+}
+
+.skeleton-placeholder {
+    display: none;
+}
+
+
 
 /* ===== Splash Screen ===== */
 .splash-screen {

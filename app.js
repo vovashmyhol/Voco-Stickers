@@ -213,32 +213,62 @@ function handleBackAction() {
 function renderInventory() {
     const grid = document.getElementById('inventoryGrid');
     const packCount = document.getElementById('packCount');
-    grid.innerHTML = '';
+    if (!grid) return;
     
+    grid.innerHTML = '';
     packCount.textContent = inventory.length;
 
-    inventory.forEach(packId => {
-        const item = document.createElement('div');
-        item.className = 'inventory-item';
-        item.innerHTML = `
-            <div class="inventory-sticker-container">
+    if (inventory.length === 0) {
+        // Render Empty State
+        const emptyState = document.createElement('div');
+        emptyState.className = 'inventory-empty-state';
+        emptyState.innerHTML = `
+            <div class="empty-lottie-container">
                 <lottie-player 
-                    src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Artboard%201%20(3).json" 
+                    src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/OffPack.json" 
                     background="transparent" 
                     speed="1" 
-                    style="width: 100%; height: 100%;">
+                    loop 
+                    autoplay>
                 </lottie-player>
             </div>
-            <div class="inventory-item-name">The Pack</div>
+            <p class="empty-text">You don't have any packs yet</p>
+            <button class="go-market-btn" id="goMarketBtn">Go to market</button>
         `;
         
-        item.addEventListener('click', () => {
-            console.log('Opening modal for pack:', packId); // Debug log
-            openPackModal(packId, 'profile');
-        });
+        // Use insertBefore if grid has a specific position, or just append
+        grid.style.display = 'block'; // Change from grid to block for centering
+        grid.appendChild(emptyState);
         
-        grid.appendChild(item);
-    });
+        document.getElementById('goMarketBtn').addEventListener('click', () => {
+            tg.HapticFeedback.impactOccurred('light');
+            closeProfile();
+        });
+    } else {
+        // Render Inventory Items
+        grid.style.display = 'grid'; // Ensure it's a grid again
+        inventory.forEach(packId => {
+            const item = document.createElement('div');
+            item.className = 'inventory-item';
+            item.innerHTML = `
+                <div class="inventory-sticker-container">
+                    <lottie-player 
+                        src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Artboard%201%20(3).json" 
+                        background="transparent" 
+                        speed="1" 
+                        style="width: 100%; height: 100%;">
+                    </lottie-player>
+                </div>
+                <div class="inventory-item-name">The Pack</div>
+            `;
+            
+            item.addEventListener('click', () => {
+                openPackModal(packId, 'profile');
+            });
+            
+            grid.appendChild(item);
+        });
+    }
 }
 
 // 4. Modal Close

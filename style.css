@@ -788,3 +788,36 @@ body {
     font-family: var(--font-main); 
     pointer-events: none;
 }
+
+/* ===== Splash Screen ===== */
+.splash-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #1c1c1e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.splash-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Lottie container */
+.splash-logo-wrap {
+    width: 250px;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.splash-logo-wrap lottie-player {
+    width: 100%;
+    height: 100%;
+}
+

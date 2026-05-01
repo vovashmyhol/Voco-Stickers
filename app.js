@@ -1,32 +1,49 @@
 // Initialize Telegram WebApp
-const tg = window.Telegram.WebApp;
+const tg = window.Telegram?.WebApp || {};
+
+// Splash screen: show for at least 1500ms, then fade out
+function hideSplash() {
+    const splash = document.getElementById('splashScreen');
+    if (!splash) return;
+    splash.classList.add('hidden');
+    // Remove from DOM after transition finishes (fallback: remove after 600ms)
+    const cleanup = () => splash.remove();
+    splash.addEventListener('transitionend', cleanup, { once: true });
+    setTimeout(cleanup, 600);
+}
+
+// Hard fallback: hide splash no matter what (even if DOMContentLoaded fails)
+setTimeout(hideSplash, 3000);
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Expand the app and request immersive fullscreen
-    tg.expand();
-    if (tg.requestFullscreen) {
-        tg.requestFullscreen();
+    try {
+        if (tg.expand) tg.expand();
+        if (tg.requestFullscreen) tg.requestFullscreen();
+        if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+        if (tg.setHeaderColor) tg.setHeaderColor('#0088cc');
+        if (tg.setBackgroundColor) tg.setBackgroundColor('#050b1a');
+    } catch (e) {
+        console.warn('Telegram SDK not available:', e);
     }
-    tg.disableVerticalSwipes(); // Prevents free pulling down to close at the top
     
-    // 2. Set Theme Colors
-    tg.setHeaderColor('#0088cc'); // Using the Voco blue
-    tg.setBackgroundColor('#050b1a'); // Dark background
-    
-    // 3. Initialize User Data
+    // 2. Initialize User Data
     initUserData();
     
-    // 4. Carousel Scroll Handling
+    // 3. Carousel Scroll Handling
     initCarousel();
  
-    // 5. Scroll Overlay Handling (Blur effect on top)
+    // 4. Scroll Overlay Handling (Blur effect on top)
     initScrollEffect();
  
-    // 7. Modal Gestures (Swipe to close)
+    // 5. Modal Gestures (Swipe to close)
     initModalGestures();
     
-    // 8. Telegram Main Button
-    tg.ready();
+    // 6. Telegram ready signal
+    try { if (tg.ready) tg.ready(); } catch (e) {}
+
+    // 7. Hide splash after minimum display time (1500ms = ~1 pulse cycle)
+    setTimeout(hideSplash, 1500);
 });
  
 /**

@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     initUserData();
+    initInventory(); // New async initialization
     initCarousel();
     initScrollEffect();
     initModalGestures();
@@ -91,6 +92,9 @@ function initUserData() {
         if (user.photo_url) {
             userPhotoImg.src = user.photo_url;
             userPhotoLarge.src = user.photo_url;
+            // Also update reward modal photo
+            const rewardUserPhoto = document.getElementById('rewardUserPhoto');
+            if (rewardUserPhoto) rewardUserPhoto.src = user.photo_url;
         }
         
         const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User';
@@ -138,9 +142,64 @@ function initCarousel() {
  * PHASE 2: Modal, Purchase and Inventory Logic
  */
  
-// Inventory State (Mocked with LocalStorage)
 const INVENTORY_KEY = 'voco_inventory';
-let inventory = JSON.parse(localStorage.getItem(INVENTORY_KEY) || '[]');
+let inventory = [];
+
+/**
+ * PHASE 2: Storage, Modal, Purchase and Inventory Logic
+ */
+
+// Helper to interact with CloudStorage via Promises
+const storage = {
+    get: (key) => new Promise((resolve) => {
+        try {
+            if (tg.CloudStorage) {
+                tg.CloudStorage.getItem(key, (err, value) => {
+                    if (err) {
+                        console.error('CloudStorage Get Error:', err);
+                        resolve(localStorage.getItem(key)); // Fallback
+                    } else {
+                        resolve(value);
+                    }
+                });
+            } else {
+                resolve(localStorage.getItem(key));
+            }
+        } catch (e) {
+            resolve(localStorage.getItem(key));
+        }
+    }),
+    set: (key, value) => new Promise((resolve) => {
+        try {
+            if (tg.CloudStorage) {
+                tg.CloudStorage.setItem(key, value, (err, success) => {
+                    if (err) console.error('CloudStorage Set Error:', err);
+                    // Always update localStorage as well for redundancy/fallback
+                    localStorage.setItem(key, value);
+                    resolve(success);
+                });
+            } else {
+                localStorage.setItem(key, value);
+                resolve(true);
+            }
+        } catch (e) {
+            localStorage.setItem(key, value);
+            resolve(false);
+        }
+    })
+};
+
+async function initInventory() {
+    const data = await storage.get(INVENTORY_KEY);
+    try {
+        inventory = data ? JSON.parse(data) : [];
+        console.log('Inventory loaded:', inventory);
+    } catch (e) {
+        inventory = [];
+    }
+    // Render inventory once loaded
+    renderInventory();
+}
  
 const modal = document.getElementById('packModal');
 const buyBtn = document.getElementById('buyBtn');
@@ -235,6 +294,16 @@ function renderInventory() {
     grid.innerHTML = '';
     packCount.textContent = inventory.length;
 
+    // Show crown if 5 or more packs
+    const profileCrown = document.querySelector('.user-crown');
+    if (profileCrown) {
+        if (inventory.length >= 5) {
+            profileCrown.classList.add('visible');
+        } else {
+            profileCrown.classList.remove('visible');
+        }
+    }
+
     if (inventory.length === 0) {
         // Render Empty State
         const emptyState = document.createElement('div');
@@ -264,7 +333,10 @@ function renderInventory() {
     } else {
         // Render Inventory Items
         grid.style.display = 'grid'; // Ensure it's a grid again
-        inventory.forEach(packId => {
+        inventory.forEach(itemData => {
+            // Support both old string format and new object format for stability
+            const packId = typeof itemData === 'string' ? itemData : itemData.id;
+            
             const item = document.createElement('div');
             item.className = 'inventory-item';
             item.innerHTML = `
@@ -476,18 +548,32 @@ document.getElementById('buyBtn').addEventListener('click', () => {
     }
 });
  
-function confirmPurchase(packId) {
-    if (!inventory.includes(packId)) {
-        inventory.push(packId);
-        localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
-    }
+async function confirmPurchase(packId) {
+    // Generate a unique instance ID for this acquisition
+    const instanceId = `${packId}_${Date.now()}`;
+    inventory.push({
+        id: packId,
+        instanceId: instanceId,
+        purchasedAt: new Date().toISOString()
+    });
+    
+    // Save to CloudStorage
+    await storage.set(INVENTORY_KEY, JSON.stringify(inventory));
     
     tg.HapticFeedback.notificationOccurred('success');
     showSuccessModal(packId);
+
+    // Check for Crown Reward (exactly 5 packs)
+    if (inventory.length === 5) {
+        setTimeout(() => {
+            showRewardModal();
+        }, 1500); // Small delay after success modal shows
+    }
 }
 
-// Global interval for continuous stars
+// Global intervals for continuous stars
 let continuousStarsInterval = null;
+let rewardStarsInterval = null;
 
 function showSuccessModal(packId) {
     const successModal = document.getElementById('successModal');
@@ -535,8 +621,8 @@ function showSuccessModal(packId) {
         okBtn.onclick = null;
     };
 }
-function createStarExplosion(count = 40, isContinuous = false) {
-    const container = document.getElementById('starExplosion');
+function createStarExplosion(count = 40, isContinuous = false, targetId = 'starExplosion') {
+    const container = document.getElementById(targetId);
     if (!container) return;
 
     if (!isContinuous) container.innerHTML = '';
@@ -591,5 +677,46 @@ function stopContinuousStars() {
         continuousStarsInterval = null;
     }
 }
+
+function showRewardModal() {
+    const rewardModal = document.getElementById('rewardModal');
+    const okBtn = document.getElementById('rewardOkBtn');
+    if (!rewardModal || !okBtn) return;
+
+    rewardModal.style.display = 'flex';
+    setTimeout(() => {
+        rewardModal.classList.add('active');
+        // Initial burst
+        createStarExplosion(50, false, 'rewardExplosion');
+        // Continuous flow
+        startContinuousRewardStars();
+    }, 10);
+
+    tg.HapticFeedback.notificationOccurred('success');
+
+    okBtn.onclick = () => {
+        rewardModal.classList.remove('active');
+        stopContinuousRewardStars();
+        setTimeout(() => {
+            rewardModal.style.display = 'none';
+        }, 500);
+    };
+}
+
+function startContinuousRewardStars() {
+    if (rewardStarsInterval) clearInterval(rewardStarsInterval);
+    rewardStarsInterval = setInterval(() => {
+        createStarExplosion(3, true, 'rewardExplosion');
+    }, 200);
+}
+
+function stopContinuousRewardStars() {
+    if (rewardStarsInterval) {
+        clearInterval(rewardStarsInterval);
+        rewardStarsInterval = null;
+    }
+}
+
+
 
 

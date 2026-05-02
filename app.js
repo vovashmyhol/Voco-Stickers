@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCarousel();
     initScrollEffect();
     initModalGestures();
+    initRewardModalGestures(); // New
     
     try { if (tg.ready) tg.ready(); } catch (e) {}
 });
@@ -694,14 +695,75 @@ function showRewardModal() {
 
     tg.HapticFeedback.notificationOccurred('success');
 
-    okBtn.onclick = () => {
+    const handleClose = () => {
         rewardModal.classList.remove('active');
         stopContinuousRewardStars();
         setTimeout(() => {
             rewardModal.style.display = 'none';
+            // Reset transforms
+            const content = rewardModal.querySelector('.reward-content');
+            if (content) content.style.transform = '';
+            rewardModal.style.background = '';
         }, 500);
     };
+
+    okBtn.onclick = handleClose;
+    rewardModal.dataset.closeHandler = 'true'; // Mark that we have logic to reset
 }
+
+function initRewardModalGestures() {
+    const modal = document.getElementById('rewardModal');
+    const content = modal.querySelector('.reward-content');
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+    let dragDelta = 0;
+
+    content.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+        isDragging = true;
+    }, { passive: true });
+
+    content.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentY = e.touches[0].clientY;
+        dragDelta = currentY - startY;
+
+        if (dragDelta > 0) {
+            content.style.transition = 'none';
+            content.style.transform = `translateY(${dragDelta}px)`;
+            
+            // Dim overlay
+            const opacity = 1 - Math.min(dragDelta / 400, 0.5);
+            modal.style.background = `rgba(0, 0, 0, ${0.7 * opacity})`;
+            
+            if (e.cancelable) e.preventDefault();
+        }
+    }, { passive: false });
+
+    const handleRelease = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        content.style.transition = 'transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)';
+
+        if (dragDelta > 100) {
+            // Close
+            const okBtn = document.getElementById('rewardOkBtn');
+            if (okBtn) okBtn.click();
+        } else {
+            // Snap back
+            content.style.transform = 'translateY(0)';
+            modal.style.background = '';
+        }
+        
+        dragDelta = 0;
+    };
+
+    content.addEventListener('touchend', handleRelease);
+    content.addEventListener('touchcancel', handleRelease);
+}
+
 
 function startContinuousRewardStars() {
     if (rewardStarsInterval) clearInterval(rewardStarsInterval);

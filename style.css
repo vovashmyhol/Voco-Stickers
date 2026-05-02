@@ -1040,3 +1040,220 @@ body {
     height: 100%;
 }
 
+
+
+/* ===== Success Modal ===== */
+.success-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: radial-gradient(circle at 50% 50%, #1a3a8a 0%, #050b1a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.success-overlay.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+}
+
+.success-overlay.fade-out {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.success-stars-bg {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(1px 1px at 10% 10%, white, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 20% 35%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 35% 20%, white, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 50% 15%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 70% 25%, white, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 85% 10%, white, rgba(0,0,0,0)),
+        radial-gradient(1.2px 1.2px at 90% 40%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 15% 60%, white, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 30% 75%, white, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 45% 65%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 60% 85%, white, rgba(0,0,0,0)),
+        radial-gradient(1.8px 1.8px at 75% 55%, white, rgba(0,0,0,0)),
+        radial-gradient(1.2px 1.2px at 85% 80%, white, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 95% 65%, white, rgba(0,0,0,0));
+    background-size: 100% 100%;
+    opacity: 0.3;
+    z-index: 1;
+}
+
+.success-content {
+    position: relative;
+    z-index: 20;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    width: 100%;
+}
+
+.sticker-reveal-wrap {
+    position: relative;
+    width: 380px;
+    height: 380px;
+    margin-bottom: 15px; /* Moved closer to text */
+    animation: stickerReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes stickerReveal {
+    0% { transform: scale(0.5) translateY(50px); opacity: 0; }
+    100% { transform: scale(1) translateY(15px); opacity: 1; }
+}
+
+.reveal-sticker-base {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+}
+
+.reveal-lottie-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(10deg);
+    width: 35%; /* Slightly larger */
+    height: 35%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    margin-top: 0;
+    margin-left: -3px; /* Shifted slightly to the left */
+    z-index: 3;
+}
+
+.success-title {
+    color: rgba(255, 255, 255, 0.5); /* Matching .empty-text */
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 30px;
+    font-family: var(--font-main);
+}
+
+.success-ok-btn {
+    position: relative; /* For the flare positioning */
+    width: 240px;
+    padding: 16px 0;
+    border-radius: 100px;
+    background: linear-gradient(#1c1c1e, #1c1c1e) padding-box,
+                linear-gradient(135deg, rgba(64, 179, 255, 0.4) 0%, rgba(64, 179, 255, 0.1) 50%, rgba(0, 136, 204, 0.4) 100%) border-box;
+    color: white;
+    border: 1.5px solid transparent;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* Keep the flare inside the button */
+}
+
+/* Suble light flare on the left - originating from top-left */
+.success-ok-btn::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    width: 100%; /* Increased width */
+    height: 200%; /* Increased height to prevent sharp bottom edge */
+    background: radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Another subtle flare on the top-right - twice as transparent */
+.success-ok-btn::after {
+    content: "";
+    position: absolute;
+    top: -50px; /* Shifted up */
+    right: -20px;
+    width: 60%;
+    height: 200%; /* Increased height */
+    background: radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.success-ok-btn:active {
+    transform: scale(0.96);
+    background: linear-gradient(135deg, rgba(64, 179, 255, 0.2), rgba(0, 136, 204, 0.2)) padding-box,
+                linear-gradient(135deg, rgba(64, 179, 255, 0.3), rgba(0, 136, 204, 0.3)) border-box;
+    opacity: 0.7;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ===== Star Explosion Effect ===== */
+.star-explosion {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: -1; /* Behind the sticker */
+}
+
+.star-particle {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    width: 2px;
+    height: 2px;
+    box-shadow: 0 0 4px white;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.breathing-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: stickerBreathe 4s ease-in-out infinite;
+    z-index: 2;
+}
+
+@keyframes stickerBreathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+
+@keyframes starEmanate {
+    0% {
+        transform: translate(0, 0) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty)) scale(1.5);
+        opacity: 0;
+    }
+}
+
+
+
+

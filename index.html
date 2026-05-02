@@ -13,6 +13,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Lottie Player -->
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
     <!-- Splash Screen -->
@@ -167,6 +168,24 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="success-overlay" style="display: none;">
+        <div class="success-stars-bg"></div>
+        <div class="success-content">
+            <div class="sticker-reveal-wrap">
+                <div id="starExplosion" class="star-explosion"></div>
+                <div class="breathing-container">
+                    <img src="Sticker.PNG" alt="Success Sticker" class="reveal-sticker-base">
+                    <div class="reveal-lottie-overlay" id="successLottieContainer">
+                        <!-- First frame or Lottie will be injected here -->
+                    </div>
+                </div>
+            </div>
+            <h2 class="success-title">Pack added to profile!</h2>
+            <button class="success-ok-btn" id="successOkBtn">OK</button>
         </div>
     </div>
 

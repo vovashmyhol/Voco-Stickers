@@ -477,9 +477,119 @@ document.getElementById('buyBtn').addEventListener('click', () => {
 });
  
 function confirmPurchase(packId) {
-    inventory.push(packId);
-    localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+    if (!inventory.includes(packId)) {
+        inventory.push(packId);
+        localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+    }
     
     tg.HapticFeedback.notificationOccurred('success');
-    updateModalUI(packId, 'market');
+    showSuccessModal(packId);
 }
+
+// Global interval for continuous stars
+let continuousStarsInterval = null;
+
+function showSuccessModal(packId) {
+    const successModal = document.getElementById('successModal');
+    const container = document.getElementById('successLottieContainer');
+    const okBtn = document.getElementById('successOkBtn');
+
+    if (!successModal || !container || !okBtn) return;
+
+    // Smooth Activation
+    successModal.classList.remove('fade-out');
+    successModal.classList.add('active');
+    successModal.style.display = 'flex'; 
+
+    // Trigger Star Explosion (Initial Burst)
+    createStarExplosion(60);
+    // Start continuous flow
+    startContinuousStars();
+
+    // Inject Lottie
+    container.innerHTML = '';
+    const player = document.createElement('lottie-player');
+    player.setAttribute('src', 'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Artboard%201%20(3).json');
+    player.setAttribute('background', 'transparent');
+    player.setAttribute('speed', '1');
+    player.setAttribute('autoplay', '');
+    player.style.width = '100%';
+    player.style.height = '100%';
+    container.appendChild(player);
+
+    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+    // Smooth Closing
+    okBtn.onclick = (e) => {
+        if (e) e.preventDefault();
+        successModal.classList.add('fade-out');
+        
+        setTimeout(() => {
+            stopContinuousStars();
+            successModal.classList.remove('active', 'fade-out');
+            successModal.style.display = 'none';
+            if (typeof closeModal === 'function') closeModal();
+            if (typeof renderInventory === 'function') renderInventory();
+        }, 500);
+
+        okBtn.onclick = null;
+    };
+}
+function createStarExplosion(count = 40, isContinuous = false) {
+    const container = document.getElementById('starExplosion');
+    if (!container) return;
+
+    if (!isContinuous) container.innerHTML = '';
+    const particleCount = count;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'star-particle';
+        
+        // Random direction and distance
+        const angle = Math.random() * Math.PI * 2;
+        const distance = isContinuous ? (150 + Math.random() * 150) : (100 + Math.random() * 200); 
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance;
+        
+        // Custom properties for CSS animation
+        particle.style.setProperty('--tx', `${tx}px`);
+        particle.style.setProperty('--ty', `${ty}px`);
+        
+        // Random size variation
+        const size = 1 + Math.random() * (isContinuous ? 1 : 2);
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Random delay and duration
+        const delay = isContinuous ? 0 : (Math.random() * 0.3);
+        const duration = isContinuous ? (2.0 + Math.random() * 2.0) : (0.8 + Math.random() * 1.2);
+        
+        particle.style.animation = `starEmanate ${duration}s cubic-bezier(0.1, 0.4, 0.2, 1) ${delay}s forwards`;
+        
+        container.appendChild(particle);
+        
+        // Cleanup particle after animation
+        setTimeout(() => {
+            if (particle.parentNode === container) {
+                container.removeChild(particle);
+            }
+        }, (duration + delay) * 1000);
+    }
+}
+
+function startContinuousStars() {
+    if (continuousStarsInterval) clearInterval(continuousStarsInterval);
+    continuousStarsInterval = setInterval(() => {
+        createStarExplosion(3, true); // Add 3 stars periodically
+    }, 200);
+}
+
+function stopContinuousStars() {
+    if (continuousStarsInterval) {
+        clearInterval(continuousStarsInterval);
+        continuousStarsInterval = null;
+    }
+}
+
+

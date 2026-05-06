@@ -480,40 +480,32 @@ function closeModal() {
  * Initialize Gesture-based closing (Swipe Down)
  */
 function initModalGestures() {
-    const modalContent = modal.querySelector('.modal-content');
+    const modalEl = document.getElementById('packModal');
+    if (!modalEl) return;
+    const modalContent = modalEl.querySelector('.modal-content');
     let startY = 0;
     let currentY = 0;
     let isDragging = false;
     let dragDelta = 0;
  
     modalContent.addEventListener('touchstart', (e) => {
-        // Only allow dragging down if we're not scrolling something else
         const scrollable = e.target.closest('.lottie-slider');
-        if (scrollable && scrollable.scrollLeft > 0) {
-            // Not allowing drag if they are mid-page in a horizontal slider
-            return;
-        }
- 
+        if (scrollable && scrollable.scrollLeft > 0) return;
+
         startY = e.touches[0].clientY;
         isDragging = true;
     }, { passive: true });
  
     modalContent.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
-        
         currentY = e.touches[0].clientY;
         dragDelta = currentY - startY;
  
         if (dragDelta > 0) {
-            // Swiping down
             modalContent.classList.add('dragging');
             modalContent.style.transform = `translateY(${dragDelta}px)`;
-            
-            // Dim the overlay slightly more as we drag
             const opacity = 1 - Math.min(dragDelta / 400, 0.5);
-            modal.style.background = `rgba(0, 0, 0, ${0.7 * opacity})`;
-            
-            // Prevent scrolling underlying page
+            modalEl.style.background = `rgba(0, 0, 0, ${0.7 * opacity})`;
             if (e.cancelable) e.preventDefault();
         }
     }, { passive: false });
@@ -521,25 +513,17 @@ function initModalGestures() {
     const handleRelease = () => {
         if (!isDragging) return;
         isDragging = false;
-        
         modalContent.classList.remove('dragging');
- 
         if (dragDelta > 100) {
-            // Close threshold met
             closeModal();
-            // Reset for next time after animation
             setTimeout(() => {
                 modalContent.style.transform = '';
-                modal.style.background = '';
+                modalEl.style.background = '';
             }, 300);
         } else {
-            // Snap back
             modalContent.style.transform = 'translateY(0)';
-            modal.style.background = '';
+            modalEl.style.background = '';
         }
-        
-        startY = 0;
-        currentY = 0;
         dragDelta = 0;
     };
  

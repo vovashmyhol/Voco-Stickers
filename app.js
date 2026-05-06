@@ -126,34 +126,36 @@ function initUserData() {
     
     if (user) {
         if (user.photo_url) {
-            userPhotoImg.src = user.photo_url;
-            userPhotoLarge.src = user.photo_url;
-            // Also update reward modal photo
+            if (userPhotoImg) userPhotoImg.src = user.photo_url;
+            if (userPhotoLarge) userPhotoLarge.src = user.photo_url;
+            
             const rewardUserPhoto = document.getElementById('rewardUserPhoto');
             if (rewardUserPhoto) rewardUserPhoto.src = user.photo_url;
-            // Also update nav photo
+            
             const navUserPhoto = document.getElementById('navUserPhoto');
             if (navUserPhoto) navUserPhoto.src = user.photo_url;
         }
         
         const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User';
-        userName.textContent = fullName;
-        ownerName.textContent = fullName;
-        userId.textContent = user.id || 'Unknown';
+        if (userName) userName.textContent = fullName;
+        if (ownerName) ownerName.textContent = fullName;
+        if (userId) userId.textContent = user.id || 'Unknown';
         
         // Handle Copy ID
-        document.getElementById('copyId').addEventListener('click', () => {
-            if (user.id) {
+        const copyBtn = document.getElementById('copyId');
+        if (copyBtn && user.id) {
+            copyBtn.onclick = () => {
                 const idStr = user.id.toString();
                 navigator.clipboard.writeText(idStr).then(() => {
                     tg.HapticFeedback.notificationOccurred('success');
-                    // Simple temporary visual feedback
-                    const originalText = userId.textContent;
-                    userId.textContent = 'Copied!';
-                    setTimeout(() => userId.textContent = originalText, 1000);
+                    if (userId) {
+                        const originalText = userId.textContent;
+                        userId.textContent = 'Copied!';
+                        setTimeout(() => userId.textContent = originalText, 1000);
+                    }
                 });
-            }
-        });
+            };
+        }
     }
 }
  

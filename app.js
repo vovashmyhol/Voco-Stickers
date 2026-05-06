@@ -56,14 +56,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     initUserData();
-    initInventory(); // New async initialization
+    initInventory(); 
     initCarousel();
     initScrollEffect();
     initModalGestures();
-    initRewardModalGestures(); // New
+    initRewardModalGestures(); 
+    initModalSlider(); 
     
+    // Initial tab setup
+    window.switchTab = switchTab;
+
     try { if (tg.ready) tg.ready(); } catch (e) {}
 });
+
+/**
+ * Tab Switching Logic
+ */
+function switchTab(tabId) {
+    const vocoTab = document.getElementById('vocoTab');
+    const creatorsTab = document.getElementById('creatorsTab');
+    const btnVoco = document.getElementById('tabVoco');
+    const btnCreators = document.getElementById('tabCreators');
+
+    if (tabId === 'voco') {
+        vocoTab.classList.add('active');
+        creatorsTab.classList.remove('active');
+        btnVoco.classList.add('active');
+        btnCreators.classList.remove('active');
+        document.body.classList.remove('creators-active');
+    } else if (tabId === 'creators') {
+        vocoTab.classList.remove('active');
+        creatorsTab.classList.add('active');
+        btnVoco.classList.remove('active');
+        btnCreators.classList.add('active');
+        document.body.classList.add('creators-active');
+    }
+
+    if (tg.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('light');
+    }
+}
  
 /**
  * Handle top blur overlay on scroll
@@ -96,6 +128,9 @@ function initUserData() {
             // Also update reward modal photo
             const rewardUserPhoto = document.getElementById('rewardUserPhoto');
             if (rewardUserPhoto) rewardUserPhoto.src = user.photo_url;
+            // Also update nav photo
+            const navUserPhoto = document.getElementById('navUserPhoto');
+            if (navUserPhoto) navUserPhoto.src = user.photo_url;
         }
         
         const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User';
@@ -212,16 +247,17 @@ document.getElementById('vocoPack').addEventListener('click', () => {
     openPackModal('VocoX');
 });
  
-// 2. Profile button (Show Profile View)
-document.getElementById('profileBtn').addEventListener('click', () => {
-    tg.HapticFeedback.impactOccurred('medium');
-    openProfile();
-});
+// 2. Tab items are handled via switchTab in HTML
 
 function openProfile() {
     renderInventory();
     const profileView = document.getElementById('profileView');
     profileView.classList.add('active');
+    
+    // Set profile tab as active
+    document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+    document.getElementById('tabProfile').classList.add('active');
+
     updateBackButton();
     initProfileElasticScroll(profileView);
 }
@@ -251,6 +287,15 @@ function initProfileElasticScroll(profileView) {
 function closeProfile() {
     const profileView = document.getElementById('profileView');
     if (profileView) profileView.classList.remove('active');
+    
+    // Restore active tab based on which one is active in the content
+    const vocoTab = document.getElementById('vocoTab');
+    if (vocoTab.classList.contains('active')) {
+        switchTab('voco');
+    } else {
+        switchTab('creators');
+    }
+
     updateBackButton();
 }
 
@@ -343,7 +388,7 @@ function renderInventory() {
             item.innerHTML = `
                 <div class="inventory-sticker-container">
                     <lottie-player 
-                        src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Artboard%201%20(3).json" 
+                        src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json" 
                         background="transparent" 
                         speed="1" 
                         style="width: 100%; height: 100%;">
@@ -596,7 +641,7 @@ function showSuccessModal(packId) {
     // Inject Lottie
     container.innerHTML = '';
     const player = document.createElement('lottie-player');
-    player.setAttribute('src', 'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Artboard%201%20(3).json');
+    player.setAttribute('src', 'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json');
     player.setAttribute('background', 'transparent');
     player.setAttribute('speed', '1');
     player.setAttribute('autoplay', '');

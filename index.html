@@ -24,8 +24,9 @@
     </div>
 
     <div id="app" class="is-loading">
-        <!-- Background Layer -->
+        <!-- Background Layers -->
         <div class="main-background"></div>
+        <div class="creators-background"></div>
 
         <!-- Scroll-triggered Blur Overlay -->
         <div id="scrollOverlay" class="scroll-overlay"></div>
@@ -33,42 +34,98 @@
         <!-- Scrolling Headroom Spacer -->
         <div class="scroll-headroom"></div>
 
-        <!-- Header Content -->
-        <header class="main-header">
-            <div class="avatar-container">
-                <img src="voco_logo.jpg" alt="Voco Logo" class="profile-avatar">
-            </div>
-            <div class="brand-info">
-                <div class="brand-name">
-                    <h1>VOCO</h1>
-                    <img src="verify.WEBP" alt="Verified" class="verify-badge">
-                </div>
-                <a href="https://t.me/voco_in" class="channel-link" target="_blank">by <span>@voco_in</span></a>
-            </div>
-        </header>
+        <!-- Tabs Container -->
+        <div id="tabsContainer" class="tabs-container">
+            <!-- Voco Tab (Current Content) -->
+            <div id="vocoTab" class="tab-pane active">
+                <!-- Header Content -->
+                <header class="main-header">
+                    <div class="avatar-container">
+                        <img src="voco_logo.jpg" alt="Voco Logo" class="profile-avatar">
+                    </div>
+                    <div class="brand-info">
+                        <div class="brand-name">
+                            <h1>VOCO</h1>
+                            <img src="verify.WEBP" alt="Verified" class="verify-badge">
+                        </div>
+                        <a href="https://t.me/voco_in" class="channel-link" target="_blank">by <span>@voco_in</span></a>
+                    </div>
+                </header>
 
-        <!-- Collections Section -->
-        <section class="collections-section">
-            <h2 class="section-title">Collections</h2>
-            <div class="collections-carousel" id="collectionsCarousel">
-                <div class="pack-card skeleton-placeholder skeleton"></div>
-                <div class="pack-card skeleton-target" id="vocoPack">
-                    <div class="pack-supply-tag">333/333</div>
-                    <img src="пак.jpg" alt="Voco Pack" class="pack-image">
-                </div>
-                <!-- Future packs can be added here -->
+                <!-- Collections Section -->
+                <section class="collections-section">
+                    <h2 class="section-title">Collections</h2>
+                    <div class="collections-carousel" id="collectionsCarousel">
+                        <div class="pack-card skeleton-placeholder skeleton"></div>
+                        <div class="pack-card skeleton-target" id="vocoPack">
+                            <div class="pack-supply-tag">333/333</div>
+                            <img src="пак.jpg" alt="Voco Pack" class="pack-image">
+                        </div>
+                    </div>
+                    <div class="carousel-dots">
+                        <span class="dot active"></span>
+                    </div>
+                </section>
             </div>
-            <div class="carousel-dots">
-                <span class="dot active"></span>
-            </div>
-        </section>
 
-        <!-- Profile Navigation (Bottom Right) -->
-        <div class="profile-nav-container">
-            <button class="profile-button" id="profileBtn">
-                <img id="userPhoto" src="voco_logo.jpg" alt="Profile" class="user-avatar">
-            </button>
+            <!-- Creators Tab -->
+            <div id="creatorsTab" class="tab-pane">
+                <div class="creators-header-spacer"></div>
+
+                <div class="creators-banner">
+                    <img src="Прмер.jpg" alt="Banner" class="banner-img"> <!-- Placeholder image -->
+                    <div class="banner-content">
+                        <h2>Top Creators</h2>
+                        <p>Explore packs from the best artists</p>
+                    </div>
+                </div>
+
+                <section class="creators-collections">
+                    <div class="collection-header">
+                        <h2 class="section-title">New Arrivals</h2>
+                    </div>
+                    <div class="creators-grid">
+                        <div class="creator-card">
+                            <div class="creator-card-img skeleton"></div>
+                            <div class="creator-card-info">
+                                <span class="creator-name">Artist Name</span>
+                                <span class="creator-price">15 Stars</span>
+                            </div>
+                        </div>
+                        <div class="creator-card">
+                            <div class="creator-card-img skeleton"></div>
+                            <div class="creator-card-info">
+                                <span class="creator-name">Artist Name</span>
+                                <span class="creator-price">20 Stars</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </div>
+
+        <!-- Bottom Tab Bar (iOS 26 Style) -->
+        <nav class="bottom-tab-bar">
+            <div class="tab-item active" id="tabVoco" onclick="switchTab('voco')">
+                <div class="tab-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                </div>
+                <span class="tab-label">VOCO</span>
+            </div>
+            <div class="tab-item" id="tabCreators" onclick="switchTab('creators')">
+                <div class="tab-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="14.31" y1="8" x2="20.05" y2="17.94"></line><line x1="9.69" y1="8" x2="21.17" y2="8"></line><line x1="7.38" y1="12" x2="13.12" y2="2.06"></line><line x1="9.69" y1="16" x2="3.95" y2="6.06"></line><line x1="14.31" y1="16" x2="2.83" y2="16"></line><line x1="16.62" y1="12" x2="10.88" y2="21.94"></line></svg>
+                </div>
+                <span class="tab-label">Creators</span>
+            </div>
+            <div class="tab-item" id="tabProfile" onclick="openProfile()">
+                <div class="tab-icon">
+                    <img id="navUserPhoto" src="voco_logo.jpg" alt="Profile" class="nav-avatar">
+                </div>
+                <span class="tab-label">Profile</span>
+            </div>
+        </nav>
+
 
         <!-- Profile View -->
         <div id="profileView" class="profile-page">

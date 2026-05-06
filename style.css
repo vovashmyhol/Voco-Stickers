@@ -29,7 +29,7 @@ body {
     width: 100%;
 }
 
-/* Background Layer */
+/* Background Layer - Only for Voco Tab */
 .main-background {
     position: fixed;
     top: 0;
@@ -40,6 +40,11 @@ body {
     background-size: cover;
     z-index: -1;
     transform: scale(1.1); /* Subtle scale for depth */
+    transition: opacity 0.5s ease;
+}
+
+body.creators-active .main-background {
+    opacity: 0;
 }
 
 /* Scroll-triggered Blur Overlay */
@@ -338,6 +343,242 @@ body {
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
+}
+
+/* Tabs System */
+.tabs-container {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+}
+
+.tab-pane {
+    display: none;
+    width: 100%;
+    animation: fadeInTab 0.5s ease-out forwards;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeInTab {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Creators Tab Specific Styles */
+.creators-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('creator fon.PNG') no-repeat center top;
+    background-size: cover;
+    z-index: -1;
+    transform: scale(1.1);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+body.creators-active .creators-background {
+    opacity: 1;
+}
+
+body.creators-active .main-background {
+    opacity: 0;
+}
+
+.creators-header-spacer {
+    height: 80px; /* Space between top and banner */
+}
+
+.creators-banner {
+    margin: 0 15px 30px 15px;
+    height: 160px;
+    position: relative;
+    border-radius: 30px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.banner-content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    padding: 25px;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.banner-content h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: white;
+}
+
+.banner-content p {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.creators-collections {
+    margin: 0 15px 120px 15px;
+}
+
+.collection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    margin-bottom: 20px;
+}
+
+.creators-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.creator-card {
+    background: var(--glass-background);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 12px;
+    border: 1px solid var(--glass-border);
+    transition: transform 0.2s;
+}
+
+.creator-card:active {
+    transform: scale(0.95);
+}
+
+.creator-card-img {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.creator-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.creator-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.creator-price {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Bottom Tab Bar - iOS 26 Style */
+.bottom-tab-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    height: 70px;
+    background: rgba(28, 28, 30, 0.7);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border-radius: 35px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+    z-index: 1000;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: tabPopUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes tabPopUp {
+    from { transform: translateY(100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.tab-item.active {
+    color: #40B3FF;
+}
+
+.tab-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab-icon svg {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tab-item.active .tab-icon svg {
+    transform: scale(1.2);
+}
+
+.tab-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.nav-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid transparent;
+    transition: border-color 0.3s;
+}
+
+.tab-item.active .nav-avatar {
+    border-color: #40B3FF;
+}
+
+.skeleton {
+    background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite linear;
+}
+
+@keyframes skeletonLoading {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
 }
 
 @media (min-width: 600px) {

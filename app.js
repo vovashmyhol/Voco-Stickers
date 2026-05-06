@@ -77,6 +77,7 @@ function switchTab(tabId) {
     const creatorsTab = document.getElementById('creatorsTab');
     const btnVoco = document.getElementById('tabVoco');
     const btnCreators = document.getElementById('tabCreators');
+    const indicator = document.getElementById('navIndicator');
 
     if (tabId === 'voco') {
         vocoTab.classList.add('active');
@@ -84,12 +85,14 @@ function switchTab(tabId) {
         btnVoco.classList.add('active');
         btnCreators.classList.remove('active');
         document.body.classList.remove('creators-active');
+        if (indicator) indicator.style.transform = 'translateX(0%)';
     } else if (tabId === 'creators') {
         vocoTab.classList.remove('active');
         creatorsTab.classList.add('active');
         btnVoco.classList.remove('active');
         btnCreators.classList.add('active');
         document.body.classList.add('creators-active');
+        if (indicator) indicator.style.transform = 'translateX(100%)';
     }
 
     if (tg.HapticFeedback) {
@@ -253,10 +256,10 @@ function openProfile() {
     renderInventory();
     const profileView = document.getElementById('profileView');
     profileView.classList.add('active');
+    document.body.classList.add('profile-active');
     
-    // Set profile tab as active
-    document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
-    document.getElementById('tabProfile').classList.add('active');
+    // We don't change the active tab in the main bar when opening profile now
+    // as it is a separate floating button.
 
     updateBackButton();
     initProfileElasticScroll(profileView);
@@ -287,6 +290,7 @@ function initProfileElasticScroll(profileView) {
 function closeProfile() {
     const profileView = document.getElementById('profileView');
     if (profileView) profileView.classList.remove('active');
+    document.body.classList.remove('profile-active');
     
     // Restore active tab based on which one is active in the content
     const vocoTab = document.getElementById('vocoTab');
@@ -446,6 +450,7 @@ function openPackModal(packId, context = 'market') {
 
     // Show the modal
     modalEl.classList.add('active');
+    document.body.classList.add('modal-active');
     
     // Reset transform to ensure it's visible
     modalContent.style.transform = 'translate3d(0, 0, 0)';
@@ -458,6 +463,7 @@ function closeModal() {
     if (!modalEl) return;
     
     modalEl.classList.remove('active');
+    document.body.classList.remove('modal-active');
     
     const modalContent = modalEl.querySelector('.modal-content');
     if (modalContent) {
@@ -660,6 +666,7 @@ function showSuccessModal(packId) {
             stopContinuousStars();
             successModal.classList.remove('active', 'fade-out');
             successModal.style.display = 'none';
+            document.body.classList.remove('modal-active');
             if (typeof closeModal === 'function') closeModal();
             if (typeof renderInventory === 'function') renderInventory();
         }, 500);

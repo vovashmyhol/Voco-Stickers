@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 :root {
     --primary-blue: #0088cc;
     --background-dark: #050b1a;
@@ -36,7 +38,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('фон.PNG') no-repeat center top;
+    background: url("фон.PNG") no-repeat center top;
     background-size: cover;
     z-index: -1;
     transform: scale(1.1); /* Subtle scale for depth */
@@ -374,7 +376,7 @@ body.creators-active .main-background {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('creator fon.PNG') no-repeat center top;
+    background: url("creator fon.PNG") no-repeat center top;
     background-size: cover;
     z-index: -1;
     transform: scale(1.1);
@@ -397,7 +399,7 @@ body.creators-active .main-background {
 
 .creators-banner {
     margin: 0 15px 30px 15px;
-    height: 160px;
+    height: 120px; /* Reduced as requested */
     position: relative;
     border-radius: 30px;
     overflow: hidden;
@@ -494,46 +496,86 @@ body.creators-active .main-background {
     color: rgba(255, 255, 255, 0.6);
 }
 
-/* Bottom Tab Bar - iOS 26 Style */
-.bottom-tab-bar {
+/* Bottom Nav Container (Simplified & Fixed) */
+.bottom-nav-container {
     position: fixed;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    height: 70px;
-    background: rgba(28, 28, 30, 0.7);
-    backdrop-filter: blur(25px) saturate(180%);
-    -webkit-backdrop-filter: blur(25px) saturate(180%);
-    border-radius: 35px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    bottom: 40px; /* Slightly higher from edge */
+    left: 25px;   /* Balanced width */
+    right: 25px;
     display: flex;
-    justify-content: space-around;
     align-items: center;
-    padding: 0 10px;
-    z-index: 1000;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    animation: tabPopUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    justify-content: space-between; /* Push bar left, circle right */
+    gap: 15px;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes tabPopUp {
-    from { transform: translateY(100px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+/* Show only after loading */
+#app:not(.is-loading) .bottom-nav-container {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+/* Force hide when profile or modal is active (Higher priority) */
+body.profile-active #app .bottom-nav-container,
+body.modal-active #app .bottom-nav-container {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(20px) !important;
+    transition: opacity 0.3s ease, transform 0.3s ease !important;
+}
+
+.bottom-nav-main {
+    flex: 1;
+    height: 66px;
+    background: rgba(0, 0, 0, 0.2); /* Darker glass for better contrast */
+    backdrop-filter: blur(50px) saturate(200%);
+    -webkit-backdrop-filter: blur(50px) saturate(200%);
+    border-radius: 33px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    position: relative;
+}
+
+/* Sliding Indicator (2 Tabs) - Tighter & Lighter */
+.nav-indicator {
+    position: absolute;
+    top: 3.5px;
+    left: 3.5px;
+    width: calc((100% - 7px) / 2);
+    height: calc(100% - 7px);
+    background: rgba(255, 255, 255, 0.1); /* Lighter glass */
+    border-radius: 31px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tab-item {
+    flex: 1;
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 4px;
-    color: rgba(255, 255, 255, 0.4);
-    transition: all 0.3s ease;
+    color: white;
     cursor: pointer;
-    padding: 10px;
-    border-radius: 20px;
+    transition: color 0.3s ease;
+    border-radius: 32px;
+    position: relative;
+    z-index: 1; /* Above indicator */
 }
 
 .tab-item.active {
-    color: #40B3FF;
+    color: #3082F6; /* iOS Blue */
 }
 
 .tab-icon {
@@ -542,32 +584,45 @@ body.creators-active .main-background {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.tab-icon svg {
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.tab-item.active .tab-icon svg {
-    transform: scale(1.2);
+.tab-item.active .tab-icon {
+    transform: scale(1.2); /* Icon enlargement requested */
 }
 
 .tab-label {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: -0.2px;
 }
 
-.nav-avatar {
-    width: 24px;
-    height: 24px;
+.nav-avatar-large {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    border: 1.5px solid transparent;
-    transition: border-color 0.3s;
+    object-fit: cover;
 }
 
-.tab-item.active .nav-avatar {
-    border-color: #40B3FF;
+.profile-nav-circle {
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2); /* Match bar darkness */
+    backdrop-filter: blur(50px) saturate(200%);
+    -webkit-backdrop-filter: blur(50px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s;
+}
+
+.profile-nav-circle:active {
+    transform: scale(0.9);
 }
 
 .skeleton {

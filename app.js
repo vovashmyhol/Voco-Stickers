@@ -9,7 +9,7 @@ function hideSplash() {
     const splash = document.getElementById('splashScreen');
     const app = document.getElementById('app');
     if (!splash) return;
-    
+
     splash.classList.add('hidden');
     if (app) app.classList.remove('is-loading');
 
@@ -54,19 +54,19 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
         console.warn('Telegram SDK not available:', e);
     }
-    
+
     initUserData();
-    initInventory(); 
+    initInventory();
     initCarousel();
     initScrollEffect();
     initModalGestures();
-    initRewardModalGestures(); 
-    initModalSlider(); 
-    
+    initRewardModalGestures();
+    initModalSlider();
+
     // Initial tab setup
     window.switchTab = switchTab;
 
-    try { if (tg.ready) tg.ready(); } catch (e) {}
+    try { if (tg.ready) tg.ready(); } catch (e) { }
 });
 
 /**
@@ -122,7 +122,7 @@ function switchTab(tabId) {
         tg.HapticFeedback.impactOccurred('light');
     }
 }
- 
+
 /**
  * Handle top blur overlay on scroll
  */
@@ -135,7 +135,7 @@ function initScrollEffect() {
         overlay.style.opacity = opacity;
     });
 }
- 
+
 /**
  * Initialize User Data from Telegram
  */
@@ -146,24 +146,24 @@ function initUserData() {
     const userName = document.getElementById('userName');
     const userId = document.getElementById('userId');
     const ownerName = document.getElementById('ownerName');
-    
+
     if (user) {
         if (user.photo_url) {
             if (userPhotoImg) userPhotoImg.src = user.photo_url;
             if (userPhotoLarge) userPhotoLarge.src = user.photo_url;
-            
+
             const rewardUserPhoto = document.getElementById('rewardUserPhoto');
             if (rewardUserPhoto) rewardUserPhoto.src = user.photo_url;
-            
+
             const navUserPhoto = document.getElementById('navUserPhoto');
             if (navUserPhoto) navUserPhoto.src = user.photo_url;
         }
-        
+
         const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User';
         if (userName) userName.textContent = fullName;
         if (ownerName) ownerName.textContent = fullName;
         if (userId) userId.textContent = user.id || 'Unknown';
-        
+
         // Handle Copy ID
         const copyBtn = document.getElementById('copyId');
         if (copyBtn && user.id) {
@@ -181,31 +181,31 @@ function initUserData() {
         }
     }
 }
- 
+
 /**
  * Carousel logic for updating pagination dots
  */
 function initCarousel() {
     const carousel = document.getElementById('collectionsCarousel');
     const dots = document.querySelectorAll('.dot');
-    
+
     if (!carousel) return;
- 
+
     carousel.onscroll = () => {
         const scrollPosition = carousel.scrollLeft;
         const cardWidth = carousel.querySelector('.pack-card').offsetWidth;
         const activeIndex = Math.round(scrollPosition / cardWidth);
-        
+
         dots.forEach((dot, index) => {
             dot.classList.toggle('active', index === activeIndex);
         });
     };
 }
- 
+
 /**
  * PHASE 2: Modal, Purchase and Inventory Logic
  */
- 
+
 const INVENTORY_KEY = 'voco_inventory';
 let inventory = [];
 
@@ -264,17 +264,58 @@ async function initInventory() {
     // Render inventory once loaded
     renderInventory();
 }
- 
+
 const modal = document.getElementById('packModal');
 const buyBtn = document.getElementById('buyBtn');
 const priceValue = document.getElementById('priceValue');
- 
+
 // 1. Pack click handling (Open Modal)
 document.getElementById('vocoPack').addEventListener('click', () => {
     tg.HapticFeedback.impactOccurred('medium');
     openPackModal('VocoX');
 });
- 
+
+const kittenPack = document.getElementById('kittenPack');
+if (kittenPack) {
+    kittenPack.addEventListener('click', () => {
+        tg.HapticFeedback.impactOccurred('medium');
+        openPackModal('Kitten');
+    });
+}
+
+let currentFilter = 'all';
+
+const collectionsSelector = document.getElementById('collectionsSelector');
+if (collectionsSelector) {
+    collectionsSelector.addEventListener('click', () => {
+        tg.HapticFeedback.impactOccurred('medium');
+
+        // Show native Action Sheet for filtering
+        tg.showActionSheet({
+            title: 'Filter Collections',
+            buttons: [
+                { id: 'all', text: 'All Packs' },
+                { id: 'VocoX', text: 'The Pack' },
+                { id: 'Kitten', text: 'Kitten Pack' }
+            ]
+        }, (buttonId) => {
+            if (buttonId) {
+                currentFilter = buttonId;
+
+                // Update selector text
+                const titleSpan = collectionsSelector.querySelector('.selector-title');
+                if (titleSpan) {
+                    if (buttonId === 'all') titleSpan.textContent = 'Collections';
+                    else if (buttonId === 'VocoX') titleSpan.textContent = 'The Pack';
+                    else if (buttonId === 'Kitten') titleSpan.textContent = 'Kitten Pack';
+                }
+
+                renderInventory();
+            }
+        });
+    });
+}
+
 // 2. Tab items are handled via switchTab in HTML
 
 function openProfile() {
@@ -282,7 +323,7 @@ function openProfile() {
     const profileView = document.getElementById('profileView');
     profileView.classList.add('active');
     document.body.classList.add('profile-active');
-    
+
     // We don't change the active tab in the main bar when opening profile now
     // as it is a separate floating button.
 
@@ -293,10 +334,10 @@ function openProfile() {
 function initProfileElasticScroll(profileView) {
     const headerBg = document.getElementById('profileHeaderBg');
     const starsBg = document.getElementById('profileStarsBg');
-    
+
     profileView.onscroll = () => {
         const scrollTop = profileView.scrollTop;
-        
+
         if (scrollTop < 0) {
             // Pulling down (Overscroll)
             const scale = 1 + Math.abs(scrollTop) / 500;
@@ -316,7 +357,7 @@ function closeProfile() {
     const profileView = document.getElementById('profileView');
     if (profileView) profileView.classList.remove('active');
     document.body.classList.remove('profile-active');
-    
+
     // Restore active tab based on which one is active in the content
     const vocoTab = document.getElementById('vocoTab');
     if (vocoTab.classList.contains('active')) {
@@ -334,13 +375,13 @@ function closeProfile() {
 function updateBackButton() {
     const profileView = document.getElementById('profileView');
     const modalEl = document.getElementById('packModal');
-    
+
     const isProfileActive = profileView && profileView.classList.contains('active');
     const isModalActive = modalEl && modalEl.classList.contains('active');
 
     if (isProfileActive || isModalActive) {
         tg.BackButton.show();
-        tg.BackButton.offClick(handleBackAction); 
+        tg.BackButton.offClick(handleBackAction);
         tg.BackButton.onClick(handleBackAction);
     } else {
         tg.BackButton.hide();
@@ -350,7 +391,7 @@ function updateBackButton() {
 function handleBackAction() {
     const modalEl = document.getElementById('packModal');
     const profileView = document.getElementById('profileView');
-    
+
     const isModalActive = modalEl && modalEl.classList.contains('active');
     const isProfileActive = profileView && profileView.classList.contains('active');
 
@@ -365,7 +406,7 @@ function renderInventory() {
     const grid = document.getElementById('inventoryGrid');
     const packCount = document.getElementById('packCount');
     if (!grid) return;
-    
+
     grid.innerHTML = '';
     packCount.textContent = inventory.length;
 
@@ -379,7 +420,16 @@ function renderInventory() {
         }
     }
 
-    if (inventory.length === 0) {
+    // Filter inventory based on selection
+    let displayInventory = inventory;
+    if (currentFilter !== 'all') {
+        displayInventory = inventory.filter(item => {
+            const id = typeof item === 'string' ? item : item.id;
+            return id === currentFilter;
+        });
+    }
+
+    if (displayInventory.length === 0) {
         // Render Empty State
         const emptyState = document.createElement('div');
         emptyState.className = 'inventory-empty-state';
@@ -393,43 +443,53 @@ function renderInventory() {
                     autoplay>
                 </lottie-player>
             </div>
-            <p class="empty-text">You don't have any packs yet</p>
+            <p class="empty-text">
+                ${currentFilter === 'all' ? "You don't have any packs yet" : "No packs in this collection"}
+            </p>
             <button class="go-market-btn" id="goMarketBtn">Go to market</button>
         `;
-        
-        // Use insertBefore if grid has a specific position, or just append
-        grid.style.display = 'block'; // Change from grid to block for centering
+
+        grid.style.display = 'block';
         grid.appendChild(emptyState);
-        
+
         document.getElementById('goMarketBtn').addEventListener('click', () => {
             tg.HapticFeedback.impactOccurred('light');
             closeProfile();
         });
     } else {
         // Render Inventory Items
-        grid.style.display = 'grid'; // Ensure it's a grid again
-        inventory.forEach(itemData => {
-            // Support both old string format and new object format for stability
+        grid.style.display = 'grid';
+        displayInventory.forEach(itemData => {
             const packId = typeof itemData === 'string' ? itemData : itemData.id;
-            
+
+            const isKitten = packId === 'Kitten';
             const item = document.createElement('div');
             item.className = 'inventory-item';
-            item.innerHTML = `
-                <div class="inventory-sticker-container">
+
+            let itemContent = '';
+            if (isKitten) {
+                itemContent = `<img src="Kitten/CAACAgIAAxUAAWn8ngkaS9tMy3lKuzIr40hAyubNAAK8iQAChGexS4oMmkGTCWnzOwQ.webp" style="width: 100%; height: 100%; object-fit: contain;">`;
+            } else {
+                itemContent = `
                     <lottie-player 
                         src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json" 
                         background="transparent" 
                         speed="1" 
                         style="width: 100%; height: 100%;">
-                    </lottie-player>
+                    </lottie-player>`;
+            }
+
+            item.innerHTML = `
+                <div class="inventory-sticker-container">
+                    ${itemContent}
                 </div>
-                <div class="inventory-item-name">The Pack</div>
+                <div class="inventory-item-name">${isKitten ? 'Kitten Pack' : 'The Pack'}</div>
             `;
-            
+
             item.addEventListener('click', () => {
                 openPackModal(packId, 'profile');
             });
-            
+
             grid.appendChild(item);
         });
     }
@@ -439,35 +499,41 @@ function renderInventory() {
 document.getElementById('closeModal').addEventListener('click', () => {
     closeModal();
 });
- 
+
 // 4. Modal Slider Logic
 const lottieSlider = document.getElementById('lottieSlider');
-const modalDots = document.querySelectorAll('.m-dot');
- 
+
 if (lottieSlider) {
     lottieSlider.onscroll = () => {
         const scrollPosition = lottieSlider.scrollLeft;
-        const slideWidth = lottieSlider.querySelector('.lottie-slide').offsetWidth;
+        const slides = lottieSlider.querySelectorAll('.lottie-slide');
+        if (slides.length === 0) return;
+
+        const slideWidth = slides[0].offsetWidth;
         const activeIndex = Math.round(scrollPosition / slideWidth);
-        
+
+        const modalDots = document.querySelectorAll('.m-dot');
         modalDots.forEach((dot, index) => {
             dot.classList.toggle('active', index === activeIndex);
         });
     };
 }
- 
+
+let currentModalPackId = 'VocoX';
+
 function openPackModal(packId, context = 'market') {
     const modalEl = document.getElementById('packModal');
     if (!modalEl) {
         console.error('Modal element not found!');
         return;
     }
-    
+
+    currentModalPackId = packId;
     updateModalUI(packId, context);
-    
+
     const modalContent = modalEl.querySelector('.modal-content');
     modalContent.classList.remove('dragging');
-    
+
     // Impact feedback first
     if (tg.HapticFeedback) {
         tg.HapticFeedback.impactOccurred('medium');
@@ -476,31 +542,31 @@ function openPackModal(packId, context = 'market') {
     // Show the modal
     modalEl.classList.add('active');
     document.body.classList.add('modal-active');
-    
+
     // Reset transform to ensure it's visible
     modalContent.style.transform = 'translate3d(0, 0, 0)';
-    
+
     updateBackButton();
 }
- 
+
 function closeModal() {
     const modalEl = document.getElementById('packModal');
     if (!modalEl) return;
-    
+
     modalEl.classList.remove('active');
     document.body.classList.remove('modal-active');
-    
+
     const modalContent = modalEl.querySelector('.modal-content');
     if (modalContent) {
         modalContent.style.transform = 'translate3d(0, 110%, 0)';
     }
-    
+
     updateBackButton();
     if (tg.HapticFeedback) {
         tg.HapticFeedback.impactOccurred('light');
     }
 }
- 
+
 /**
  * Initialize Gesture-based closing (Swipe Down)
  */
@@ -512,7 +578,7 @@ function initModalGestures() {
     let currentY = 0;
     let isDragging = false;
     let dragDelta = 0;
- 
+
     modalContent.addEventListener('touchstart', (e) => {
         const scrollable = e.target.closest('.lottie-slider');
         if (scrollable && scrollable.scrollLeft > 0) return;
@@ -520,12 +586,12 @@ function initModalGestures() {
         startY = e.touches[0].clientY;
         isDragging = true;
     }, { passive: true });
- 
+
     modalContent.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
         currentY = e.touches[0].clientY;
         dragDelta = currentY - startY;
- 
+
         if (dragDelta > 0) {
             modalContent.classList.add('dragging');
             modalContent.style.transform = `translateY(${dragDelta}px)`;
@@ -534,7 +600,7 @@ function initModalGestures() {
             if (e.cancelable) e.preventDefault();
         }
     }, { passive: false });
- 
+
     const handleRelease = () => {
         if (!isDragging) return;
         isDragging = false;
@@ -551,64 +617,132 @@ function initModalGestures() {
         }
         dragDelta = 0;
     };
- 
+
     modalContent.addEventListener('touchend', handleRelease);
     modalContent.addEventListener('touchcancel', handleRelease);
 }
- 
+
 function updateModalUI(packId, context = 'market') {
     const marketInfo = document.getElementById('marketInfo');
     const ownerRow = document.getElementById('ownerRow');
     const buyBtn = document.getElementById('buyBtn');
     const priceValue = document.getElementById('priceValue');
+    const supplyValue = document.getElementById('supplyValue');
     const extraActions = document.getElementById('extraActions');
+    const packTitle = document.querySelector('.pack-title-bold');
+    const slider = document.getElementById('lottieSlider');
+    const modalDotsContainer = document.getElementById('modalDots');
 
     console.log('Updating Modal UI for:', packId, 'Context:', context);
 
-    // Always show market info (Price & Supply)
-    if (marketInfo) marketInfo.style.display = 'block';
-    if (priceValue) priceValue.textContent = '15';
+    // Configuration based on packId
+    let price = '15';
+    let supply = '333 of 333';
+    let title = 'The Pack';
+    let slides = [
+        'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json',
+        'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Choco.json',
+        'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Pink.json',
+        'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Sad.json',
+        'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json',
+        'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json'
+    ];
+    let isLottie = true;
+
+    if (packId === 'Kitten') {
+        price = '7';
+        supply = '99 of 99';
+        title = 'Kitten Pack';
+        slides = [
+            'Kitten/CAACAgIAAxUAAWn8ngkaS9tMy3lKuzIr40hAyubNAAK8iQAChGexS4oMmkGTCWnzOwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8ngl0Uic8CPFn8PaNlxJiYMvfAALhjgACFSupS0M1XTEi-JfEOwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8ngl7r-dZimllMsYM5Df_KmpYAALLhAACsX2oS9hrui4DeKoNOwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8nglKGrtEu5_12GtTsCPlsE-CAAIqgAAC4SKwS3OD04mbQpy0OwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8nglViygopzBLGP1ncUGJbqJxAAIimQACsBSpSzY51wAB1Vte7TsE.webp',
+            'Kitten/CAACAgIAAxUAAWn8nglXfpjgdGBxk9cUmN-rdVlhAAL1rQACrKSpS1G2Zy6MJRKwOwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8nglzg7EjC8t-OkDraKsuOsoJAAIEhAAC3p-wS8qBNPSHzJv5OwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8ngm6t03GV5JHzRdbUN6fm0wRAALBngAC-A6pSxZ1haB1v15xOwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8ngmeBwl1_yp9c9_WHlTa-XQwAAIhigAC6uqoS7oCGkyd2tf_OwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8ngmgIgbykSXGFyC6BK35sNeEAAJbiQACksqpSzFIjsCS_wWBOwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8ngmqZf5AJbl1S2LGjO1HRj3KAAJxmAACbbGpS5m7ONJOa_KyOwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8ngmwZ32WyYWJc7pXbOq49SO8AAJhkgACRDapS1J3lQ223rAVOwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8ngnBNZgjgtUo8knekJleUs9gAAL9nwACqsmpS3jKuSTGAyHXOwQ.webp',
+            'Kitten/CAACAgIAAxUAAWn8ngnDhAABwrWBfzC2N3SFbJEq7QACbZgAAor0qEtsXHpThj8f6zsE.webp',
+            'Kitten/CAACAgIAAxUAAWn8ngnU2O29CDm74uvXtPqCnCOaAALlgwACZBaoS_IaSnR-SYJoOwQ.webp',
+            'Kitten/CAACAgIAAxkBAAEDuTZp_J393n7Qp-lKIQxVL_rGa2RqDQACsJIAAiG5qEtR64MguW7vITsE.webp'
+        ];
+        isLottie = false;
+    }
+
+    if (priceValue) priceValue.textContent = price;
+    if (supplyValue) supplyValue.textContent = supply;
+    if (packTitle) packTitle.textContent = title;
+
+    // Update Slider Content
+    if (slider) {
+        slider.innerHTML = '';
+        slides.forEach(src => {
+            const slide = document.createElement('div');
+            slide.className = 'lottie-slide';
+            if (isLottie) {
+                slide.innerHTML = `<lottie-player src="${src}" background="transparent" speed="1" loop autoplay></lottie-player>`;
+            } else {
+                slide.innerHTML = `<img src="${src}" style="width: 100%; height: 100%; object-fit: contain;">`;
+            }
+            slider.appendChild(slide);
+        });
+        slider.scrollLeft = 0;
+    }
+
+    // Update Pagination Dots
+    if (modalDotsContainer) {
+        modalDotsContainer.innerHTML = '';
+        slides.forEach((_, i) => {
+            const dot = document.createElement('span');
+            dot.className = i === 0 ? 'm-dot active' : 'm-dot';
+            modalDotsContainer.appendChild(dot);
+        });
+    }
 
     if (context === 'profile') {
-        // In profile, also show owner row inside the card and change button to Open
         if (ownerRow) ownerRow.style.display = 'block';
         buyBtn.textContent = 'Open';
         buyBtn.classList.add('btn-small');
         if (extraActions) extraActions.style.display = 'flex';
     } else {
-        // In market, hide owner row and set button to Get
         if (ownerRow) ownerRow.style.display = 'none';
         buyBtn.textContent = 'Get';
         buyBtn.classList.remove('btn-small');
         if (extraActions) extraActions.style.display = 'none';
     }
 }
- 
+
 // 5. Purchase Logic
 document.getElementById('buyBtn').addEventListener('click', () => {
     // If we are in profile view, 'buyBtn' acts as 'Open'
     const isProfileActive = document.getElementById('profileView').classList.contains('active');
-    
+
     if (isProfileActive) {
-        // Open the sticker set
-        tg.openTelegramLink('https://t.me/addstickers/VocoX');
+        // Open the sticker set or profile
+        const link = currentModalPackId === 'Kitten' ? 'https://t.me/vovnx' : 'https://t.me/addstickers/VocoX';
+        tg.openTelegramLink(link);
     } else {
         // Market Mode: Purchase flow
         const invoiceUrl = 'https://t.me/$j4ADo8xWMEtDFgAAl_xEVL2lLAU';
-        
+
         if (tg.initData && tg.openInvoice) {
             tg.openInvoice(invoiceUrl, (status) => {
                 if (status === 'paid' || status === 'pending') {
-                    confirmPurchase('VocoX');
+                    confirmPurchase(currentModalPackId);
                 }
             });
         } else {
             // Browser Mode: Grant for free
-            confirmPurchase('VocoX');
+            confirmPurchase(currentModalPackId);
         }
     }
 });
- 
+
 async function confirmPurchase(packId) {
     // Generate a unique instance ID for this acquisition
     const instanceId = `${packId}_${Date.now()}`;
@@ -617,10 +751,10 @@ async function confirmPurchase(packId) {
         instanceId: instanceId,
         purchasedAt: new Date().toISOString()
     });
-    
+
     // Save to CloudStorage
     await storage.set(INVENTORY_KEY, JSON.stringify(inventory));
-    
+
     tg.HapticFeedback.notificationOccurred('success');
     showSuccessModal(packId);
 
@@ -646,23 +780,32 @@ function showSuccessModal(packId) {
     // Smooth Activation
     successModal.classList.remove('fade-out');
     successModal.classList.add('active');
-    successModal.style.display = 'flex'; 
+    successModal.style.display = 'flex';
 
     // Trigger Star Explosion (Initial Burst)
     createStarExplosion(60);
     // Start continuous flow
     startContinuousStars();
 
-    // Inject Lottie
+    // Inject Content
     container.innerHTML = '';
-    const player = document.createElement('lottie-player');
-    player.setAttribute('src', 'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json');
-    player.setAttribute('background', 'transparent');
-    player.setAttribute('speed', '1');
-    player.setAttribute('autoplay', '');
-    player.style.width = '100%';
-    player.style.height = '100%';
-    container.appendChild(player);
+    if (packId === 'Kitten') {
+        const img = document.createElement('img');
+        img.src = 'Kitten/CAACAgIAAxUAAWn8ngkaS9tMy3lKuzIr40hAyubNAAK8iQAChGexS4oMmkGTCWnzOwQ.webp';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        container.appendChild(img);
+    } else {
+        const player = document.createElement('lottie-player');
+        player.setAttribute('src', 'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json');
+        player.setAttribute('background', 'transparent');
+        player.setAttribute('speed', '1');
+        player.setAttribute('autoplay', '');
+        player.style.width = '100%';
+        player.style.height = '100%';
+        container.appendChild(player);
+    }
 
     if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 
@@ -670,7 +813,7 @@ function showSuccessModal(packId) {
     okBtn.onclick = (e) => {
         if (e) e.preventDefault();
         successModal.classList.add('fade-out');
-        
+
         setTimeout(() => {
             stopContinuousStars();
             successModal.classList.remove('active', 'fade-out');
@@ -689,34 +832,34 @@ function createStarExplosion(count = 40, isContinuous = false, targetId = 'starE
 
     if (!isContinuous) container.innerHTML = '';
     const particleCount = count;
-    
+
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.className = 'star-particle';
-        
+
         // Random direction and distance
         const angle = Math.random() * Math.PI * 2;
-        const distance = isContinuous ? (150 + Math.random() * 150) : (100 + Math.random() * 200); 
+        const distance = isContinuous ? (150 + Math.random() * 150) : (100 + Math.random() * 200);
         const tx = Math.cos(angle) * distance;
         const ty = Math.sin(angle) * distance;
-        
+
         // Custom properties for CSS animation
         particle.style.setProperty('--tx', `${tx}px`);
         particle.style.setProperty('--ty', `${ty}px`);
-        
+
         // Random size variation
         const size = 1 + Math.random() * (isContinuous ? 1 : 2);
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
-        
+
         // Random delay and duration
         const delay = isContinuous ? 0 : (Math.random() * 0.3);
         const duration = isContinuous ? (2.0 + Math.random() * 2.0) : (0.8 + Math.random() * 1.2);
-        
+
         particle.style.animation = `starEmanate ${duration}s cubic-bezier(0.1, 0.4, 0.2, 1) ${delay}s forwards`;
-        
+
         container.appendChild(particle);
-        
+
         // Cleanup particle after animation
         setTimeout(() => {
             if (particle.parentNode === container) {
@@ -793,11 +936,11 @@ function initRewardModalGestures() {
         if (dragDelta > 0) {
             content.style.transition = 'none';
             content.style.transform = `translateY(${dragDelta}px)`;
-            
+
             // Dim overlay
             const opacity = 1 - Math.min(dragDelta / 400, 0.5);
             modal.style.background = `rgba(0, 0, 0, ${0.7 * opacity})`;
-            
+
             if (e.cancelable) e.preventDefault();
         }
     }, { passive: false });
@@ -805,7 +948,7 @@ function initRewardModalGestures() {
     const handleRelease = () => {
         if (!isDragging) return;
         isDragging = false;
-        
+
         content.style.transition = 'transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1)';
 
         if (dragDelta > 100) {
@@ -817,7 +960,7 @@ function initRewardModalGestures() {
             content.style.transform = 'translateY(0)';
             modal.style.background = '';
         }
-        
+
         dragDelta = 0;
     };
 

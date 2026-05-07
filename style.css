@@ -453,10 +453,23 @@ body.creators-active .main-background {
 
 .collection-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0 10px;
+    justify-content: flex-start;
+    gap: 6px;
     margin-bottom: 20px;
+}
+
+.section-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.creators-collections .section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    padding: 0; /* No padding for creators tab */
 }
 
 .creators-grid {
@@ -469,7 +482,7 @@ body.creators-active .main-background {
     background: var(--glass-background);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border-radius: 20px;
+    border-radius: 30px;
     padding: 12px;
     border: 1px solid var(--glass-border);
     transition: transform 0.2s;
@@ -482,15 +495,18 @@ body.creators-active .main-background {
 .creator-card-img {
     width: 100%;
     aspect-ratio: 1;
-    border-radius: 15px;
-    margin-bottom: 12px;
+    border-radius: 22px;
+    margin: 0 auto 12px auto;
     background: rgba(255, 255, 255, 0.05);
+    object-fit: contain;
+    display: block;
 }
 
 .creator-card-info {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    padding-left: 10px;
 }
 
 .creator-name {
@@ -501,6 +517,17 @@ body.creators-active .main-background {
 .creator-price {
     font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.6);
+}
+
+.creator-link {
+    color: #40B3FF;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.creator-link:active {
+    opacity: 0.7;
 }
 
 /* Bottom Nav Container (Simplified & Fixed) */
@@ -743,6 +770,21 @@ body.modal-active #app .bottom-nav-container {
     padding: 0 4px; /* Slight horizontal padding for the buttons */
 }
 
+.nft-soon-badge {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #40B3FF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.6;
+}
+
 .modal-close-small {
     background: linear-gradient(rgba(28, 28, 30, 0.7), rgba(28, 28, 30, 0.7)) padding-box,
                 linear-gradient(135deg, rgba(64, 179, 255, 0.5), rgba(64, 179, 255, 0.1) 50%, rgba(255, 255, 255, 0.2)) border-box;
@@ -852,6 +894,12 @@ body.modal-active #app .bottom-nav-container {
 .lottie-slide lottie-player {
     width: 250px;
     height: 250px;
+}
+
+.lottie-slide img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
 }
 
 .pack-title-bold {
@@ -1254,12 +1302,61 @@ body.modal-active #app .bottom-nav-container {
     object-fit: cover;
 }
 
+.profile-collections-selector {
+    margin: 25px 0;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.profile-collections-selector:active {
+    transform: scale(0.97);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.selector-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.selector-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+}
+
+.selector-count {
+    background: #40B3FF;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+
+.selector-arrow {
+    color: rgba(255, 255, 255, 0.3);
+}
+
 .user-name-title {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 8px;
     color: white;
 }
+
+
+
 
 .user-stats {
     display: flex;

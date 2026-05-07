@@ -72,12 +72,23 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * Tab Switching Logic
  */
+let tabScrollPositions = {
+    voco: 0,
+    creators: 0
+};
+let currentTab = 'voco';
+
 function switchTab(tabId) {
+    if (tabId === currentTab) return;
+
     const vocoTab = document.getElementById('vocoTab');
     const creatorsTab = document.getElementById('creatorsTab');
     const btnVoco = document.getElementById('tabVoco');
     const btnCreators = document.getElementById('tabCreators');
     const indicator = document.getElementById('navIndicator');
+
+    // 1. Save current scroll position
+    tabScrollPositions[currentTab] = window.scrollY;
 
     if (tabId === 'voco') {
         vocoTab.classList.add('active');
@@ -94,6 +105,18 @@ function switchTab(tabId) {
         document.body.classList.add('creators-active');
         if (indicator) indicator.style.transform = 'translateX(100%)';
     }
+
+    // 2. Update current tab
+    currentTab = tabId;
+
+    // 3. Restore scroll position for the new tab
+    // We use a tiny timeout to ensure the DOM has updated and layout is ready
+    setTimeout(() => {
+        window.scrollTo({
+            top: tabScrollPositions[tabId],
+            behavior: 'instant'
+        });
+    }, 0);
 
     if (tg.HapticFeedback) {
         tg.HapticFeedback.impactOccurred('light');

@@ -285,41 +285,47 @@ if (kittenPack) {
 
 let currentFilter = 'all';
 
-const collectionsSelector = document.getElementById('collectionsSelector');
-if (collectionsSelector) {
-    collectionsSelector.addEventListener('click', () => {
-        tg.HapticFeedback.impactOccurred('medium');
-
-        // Show native Action Sheet for filtering
-        tg.showActionSheet({
-            title: 'Filter Collections',
-            buttons: [
-                { id: 'all', text: 'All Packs' },
-                { id: 'VocoX', text: 'The Pack' },
-                { id: 'Kitten', text: 'Kitten Pack' }
-            ]
-        }, (buttonId) => {
-            if (buttonId) {
-                currentFilter = buttonId;
-
-                // Update selector text
-                const titleSpan = collectionsSelector.querySelector('.selector-title');
-                if (titleSpan) {
-                    if (buttonId === 'all') titleSpan.textContent = 'Collections';
-                    else if (buttonId === 'VocoX') titleSpan.textContent = 'The Pack';
-                    else if (buttonId === 'Kitten') titleSpan.textContent = 'Kitten Pack';
-                }
-
-                renderInventory();
-            }
-        });
-    });
+function handleFilterSelection(buttonId) {
+    currentFilter = buttonId;
+    const titleSpan = document.querySelector('#collectionsSelector .selector-title');
+    if (titleSpan) {
+        if (buttonId === 'all') titleSpan.textContent = 'Collections';
+        else if (buttonId === 'VocoX') titleSpan.textContent = 'The Pack';
+        else if (buttonId === 'Kitten') titleSpan.textContent = 'Kitten Pack';
+    }
+    renderInventory();
 }
 
-// 2. Tab items are handled via switchTab in HTML
+function initCollectionsFilter() {
+    const selector = document.getElementById('collectionsSelector');
+    if (!selector) return;
+
+    // Use direct listener instead of global delegate
+    selector.onclick = (e) => {
+        e.stopPropagation();
+        tg.HapticFeedback.impactOccurred('medium');
+        selector.classList.toggle('active');
+    };
+
+    const dropdown = document.getElementById('collectionsDropdown');
+    if (dropdown) {
+        dropdown.onclick = (e) => {
+            const opt = e.target.closest('.filter-opt');
+            if (opt) {
+                e.stopPropagation();
+                const filterId = opt.getAttribute('data-filter');
+                document.querySelectorAll('.filter-opt').forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+                handleFilterSelection(filterId);
+                setTimeout(() => selector.classList.remove('active'), 200);
+            }
+        };
+    }
+}
 
 function openProfile() {
     renderInventory();
+    initCollectionsFilter();
     const profileView = document.getElementById('profileView');
     profileView.classList.add('active');
     document.body.classList.add('profile-active');
@@ -501,8 +507,25 @@ document.getElementById('closeModal').addEventListener('click', () => {
 });
 
 // 4. Modal Slider Logic
-const lottieSlider = document.getElementById('lottieSlider');
+function updateSmartDots(activeIndex) {
+    const modalDots = document.querySelectorAll('.m-dot');
+    modalDots.forEach((dot, index) => {
+        const distance = Math.abs(index - activeIndex);
+        dot.className = 'm-dot';
+        
+        if (distance === 0) {
+            dot.classList.add('active');
+        } else if (distance === 1) {
+            dot.classList.add('near'); // Slightly smaller
+        } else if (distance === 2) {
+            dot.classList.add('mid'); // Small
+        } else {
+            dot.classList.add('hidden'); // Hide
+        }
+    });
+}
 
+const lottieSlider = document.getElementById('lottieSlider');
 if (lottieSlider) {
     lottieSlider.onscroll = () => {
         const scrollPosition = lottieSlider.scrollLeft;
@@ -511,11 +534,7 @@ if (lottieSlider) {
 
         const slideWidth = slides[0].offsetWidth;
         const activeIndex = Math.round(scrollPosition / slideWidth);
-
-        const modalDots = document.querySelectorAll('.m-dot');
-        modalDots.forEach((dot, index) => {
-            dot.classList.toggle('active', index === activeIndex);
-        });
+        updateSmartDots(activeIndex);
     };
 }
 
@@ -571,55 +590,7 @@ function closeModal() {
  * Initialize Gesture-based closing (Swipe Down)
  */
 function initModalGestures() {
-    const modalEl = document.getElementById('packModal');
-    if (!modalEl) return;
-    const modalContent = modalEl.querySelector('.modal-content');
-    let startY = 0;
-    let currentY = 0;
-    let isDragging = false;
-    let dragDelta = 0;
-
-    modalContent.addEventListener('touchstart', (e) => {
-        const scrollable = e.target.closest('.lottie-slider');
-        if (scrollable && scrollable.scrollLeft > 0) return;
-
-        startY = e.touches[0].clientY;
-        isDragging = true;
-    }, { passive: true });
-
-    modalContent.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        currentY = e.touches[0].clientY;
-        dragDelta = currentY - startY;
-
-        if (dragDelta > 0) {
-            modalContent.classList.add('dragging');
-            modalContent.style.transform = `translateY(${dragDelta}px)`;
-            const opacity = 1 - Math.min(dragDelta / 400, 0.5);
-            modalEl.style.background = `rgba(0, 0, 0, ${0.7 * opacity})`;
-            if (e.cancelable) e.preventDefault();
-        }
-    }, { passive: false });
-
-    const handleRelease = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        modalContent.classList.remove('dragging');
-        if (dragDelta > 100) {
-            closeModal();
-            setTimeout(() => {
-                modalContent.style.transform = '';
-                modalEl.style.background = '';
-            }, 300);
-        } else {
-            modalContent.style.transform = 'translateY(0)';
-            modalEl.style.background = '';
-        }
-        dragDelta = 0;
-    };
-
-    modalContent.addEventListener('touchend', handleRelease);
-    modalContent.addEventListener('touchcancel', handleRelease);
+    // Gestures disabled — modal is full-screen, close via Telegram Back button
 }
 
 function updateModalUI(packId, context = 'market') {
@@ -702,6 +673,8 @@ function updateModalUI(packId, context = 'market') {
             dot.className = i === 0 ? 'm-dot active' : 'm-dot';
             modalDotsContainer.appendChild(dot);
         });
+        // Initialize smart dots immediately
+        updateSmartDots(0);
     }
 
     if (context === 'profile') {

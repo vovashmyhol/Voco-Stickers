@@ -153,18 +153,38 @@
                         </div>
                     </div>
                 </div>
-                <div class="profile-collections-selector" id="collectionsSelector">
-                    <div class="selector-content">
-                        <span class="selector-title">Collections</span>
+                <div class="profile-collections-wrapper">
+                    <div class="profile-collections-selector" id="collectionsSelector">
+                        <div class="selector-content">
+                            <span class="selector-title">Collections</span>
+                        </div>
+                        <div class="selector-arrow">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                        </div>
                     </div>
-                    <div class="selector-arrow">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                    <div class="collections-dropdown" id="collectionsDropdown">
+                        <div class="dropdown-inner">
+                            <button class="filter-opt active" data-filter="all">
+                                <span>All Packs</span>
+                                <div class="opt-check">✓</div>
+                            </button>
+                            <button class="filter-opt" data-filter="VocoX">
+                                <span>The Pack</span>
+                                <div class="opt-check">✓</div>
+                            </button>
+                            <button class="filter-opt" data-filter="Kitten">
+                                <span>Kitten Pack</span>
+                                <div class="opt-check">✓</div>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="inventory-grid" id="inventoryGrid">
                     <!-- Stickers will be injected here -->
                 </div>
+            </div>
+        </div>
             </div>
         </div>
 

@@ -562,9 +562,6 @@ function openPackModal(packId, context = 'market') {
     modalEl.classList.add('active');
     document.body.classList.add('modal-active');
 
-    // Reset transform to ensure it's visible
-    modalContent.style.transform = 'translate3d(0, 0, 0)';
-
     updateBackButton();
 }
 

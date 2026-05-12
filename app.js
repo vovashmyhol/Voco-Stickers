@@ -525,17 +525,19 @@ function updateSmartDots(activeIndex) {
     });
 }
 
-const lottieSlider = document.getElementById('lottieSlider');
-if (lottieSlider) {
-    lottieSlider.onscroll = () => {
-        const scrollPosition = lottieSlider.scrollLeft;
-        const slides = lottieSlider.querySelectorAll('.lottie-slide');
-        if (slides.length === 0) return;
+function initModalSlider() {
+    const lottieSlider = document.getElementById('lottieSlider');
+    if (lottieSlider) {
+        lottieSlider.onscroll = () => {
+            const scrollPosition = lottieSlider.scrollLeft;
+            const slides = lottieSlider.querySelectorAll('.lottie-slide');
+            if (slides.length === 0) return;
 
-        const slideWidth = slides[0].offsetWidth;
-        const activeIndex = Math.round(scrollPosition / slideWidth);
-        updateSmartDots(activeIndex);
-    };
+            const slideWidth = slides[0].offsetWidth;
+            const activeIndex = Math.round(scrollPosition / slideWidth);
+            updateSmartDots(activeIndex);
+        };
+    }
 }
 
 let currentModalPackId = 'VocoX';
@@ -552,6 +554,7 @@ function openPackModal(packId, context = 'market') {
 
     const modalContent = modalEl.querySelector('.modal-content');
     modalContent.classList.remove('dragging');
+    modalContent.style.transform = ''; // Clear any inline styles to let CSS classes work
 
     // Impact feedback first
     if (tg.HapticFeedback) {
@@ -571,11 +574,6 @@ function closeModal() {
 
     modalEl.classList.remove('active');
     document.body.classList.remove('modal-active');
-
-    const modalContent = modalEl.querySelector('.modal-content');
-    if (modalContent) {
-        modalContent.style.transform = 'translate3d(0, 110%, 0)';
-    }
 
     updateBackButton();
     if (tg.HapticFeedback) {

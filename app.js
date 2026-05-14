@@ -291,7 +291,7 @@ function handleFilterSelection(buttonId) {
     const titleSpan = document.querySelector('#collectionsSelector .selector-title');
     if (titleSpan) {
         if (buttonId === 'all') titleSpan.textContent = 'Collections';
-        else if (buttonId === 'VocoX') titleSpan.textContent = 'The Pack';
+        else if (buttonId === 'VocoX') titleSpan.textContent = 'Vatman family';
         else if (buttonId === 'Kitten') titleSpan.textContent = 'Kitten Pack';
     }
     renderInventory();
@@ -510,7 +510,7 @@ function renderInventory() {
                 <div class="inventory-sticker-container">
                     ${itemContent}
                 </div>
-                <div class="inventory-item-name">${isKitten ? 'Kitten Pack' : 'The Pack'}</div>
+                <div class="inventory-item-name">${isKitten ? 'Kitten Pack' : 'Vatman family'}</div>
             `;
 
             item.addEventListener('click', () => {
@@ -625,7 +625,7 @@ function updateModalUI(packId, context = 'market') {
     // Configuration based on packId
     let price = '15';
     let supply = '333 of 333';
-    let title = 'The Pack';
+    let title = 'Vatman family';
     let slides = [
         'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json',
         'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Choco.json',

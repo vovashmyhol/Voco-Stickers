@@ -801,13 +801,14 @@ body.modal-active #app .bottom-nav-container {
 .modal-top-nav {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end; /* Align dots to bottom of this area */
     width: 100%;
-    align-self: stretch; /* Fill full width */
-    height: 40px;
-    margin-top: 0; /* Margin handled by parent padding now */
-    margin-bottom: 30px;
+    align-self: stretch;
+    height: 110px; /* Reserved space for dots and badge */
+    margin-top: 0;
+    margin-bottom: 20px;
     padding: 0 4px;
+    position: relative;
 }
 
 .modal-close-small {
@@ -817,7 +818,7 @@ body.modal-active #app .bottom-nav-container {
 .nft-soon-badge {
     position: absolute;
     left: 20px; 
-    top: 110px; /* Moved even lower */
+    bottom: 0; /* Position relative to nav bottom */
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -848,13 +849,10 @@ body.modal-active #app .bottom-nav-container {
 }
 
 .modal-header-centered {
-    position: absolute;
-    left: 50%;
-    top: 107px; /* Moved even lower */
-    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-bottom: 5px; /* Alignment adjustment */
 }
 
 .modal-main-label {
@@ -912,8 +910,8 @@ body.modal-active #app .bottom-nav-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: auto 0; /* Magic centering when content is short */
-    padding-bottom: 20px; /* Buffer */
+    flex: 1; /* Take remaining space */
+    padding-bottom: 20px;
 }
 
 .pack-preview-area {
@@ -946,13 +944,17 @@ body.modal-active #app .bottom-nav-container {
 }
 
 .lottie-slide lottie-player {
-    width: 210px; /* Smaller player */
+    width: 210px;
     height: 210px;
+    max-width: 80vw;
+    max-height: 25vh; /* Responsive height limit */
 }
 
 .lottie-slide img {
-    width: 200px; /* Adjusted size for creator photos */
+    width: 200px;
     height: 200px;
+    max-width: 80vw;
+    max-height: 25vh; /* Responsive height limit */
     object-fit: contain;
 }
 

@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initModalGestures();
     initRewardModalGestures();
     initModalSlider();
+    initCollectionsFilter(); // Initialize filter once
 
     // Initial tab setup
     window.switchTab = switchTab;
@@ -298,34 +299,54 @@ function handleFilterSelection(buttonId) {
 
 function initCollectionsFilter() {
     const selector = document.getElementById('collectionsSelector');
-    if (!selector) return;
+    const dropdown = document.getElementById('collectionsDropdown');
+    if (!selector || !dropdown) return;
 
-    // Use direct listener instead of global delegate
+    // Toggle dropdown
     selector.onclick = (e) => {
         e.stopPropagation();
-        tg.HapticFeedback.impactOccurred('medium');
-        selector.classList.toggle('active');
+        const isActive = selector.classList.contains('active');
+        
+        if (!isActive) {
+            selector.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
+        } else {
+            selector.classList.remove('active');
+        }
     };
 
-    const dropdown = document.getElementById('collectionsDropdown');
-    if (dropdown) {
-        dropdown.onclick = (e) => {
-            const opt = e.target.closest('.filter-opt');
-            if (opt) {
-                e.stopPropagation();
-                const filterId = opt.getAttribute('data-filter');
-                document.querySelectorAll('.filter-opt').forEach(o => o.classList.remove('active'));
-                opt.classList.add('active');
-                handleFilterSelection(filterId);
-                setTimeout(() => selector.classList.remove('active'), 200);
-            }
-        };
-    }
+    // Option selection
+    dropdown.onclick = (e) => {
+        const opt = e.target.closest('.filter-opt');
+        if (opt) {
+            e.stopPropagation();
+            const filterId = opt.getAttribute('data-filter');
+            
+            // UI Updates
+            document.querySelectorAll('.filter-opt').forEach(o => o.classList.remove('active'));
+            opt.classList.add('active');
+            
+            handleFilterSelection(filterId);
+            
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            // Close after selection
+            setTimeout(() => {
+                selector.classList.remove('active');
+            }, 150);
+        }
+    };
+
+    // Global click-outside to close
+    document.addEventListener('click', (e) => {
+        if (selector.classList.contains('active') && !selector.contains(e.target) && !dropdown.contains(e.target)) {
+            selector.classList.remove('active');
+        }
+    });
 }
 
 function openProfile() {
     renderInventory();
-    initCollectionsFilter();
     const profileView = document.getElementById('profileView');
     profileView.classList.add('active');
     document.body.classList.add('profile-active');

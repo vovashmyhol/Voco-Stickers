@@ -653,7 +653,7 @@ function updateModalUI(packId, context = 'market') {
             if (isLottie) {
                 slide.innerHTML = `<lottie-player src="${src}" background="transparent" speed="1" loop autoplay></lottie-player>`;
             } else {
-                slide.innerHTML = `<img src="${src}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                slide.innerHTML = `<img src="${src}" alt="Pack Sticker">`;
             }
             slider.appendChild(slide);
         });

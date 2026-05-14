@@ -817,7 +817,7 @@ body.modal-active #app .bottom-nav-container {
 .nft-soon-badge {
     position: absolute;
     left: 20px; 
-    top: 60px; /* Aligned with parent padding */
+    top: 110px; /* Moved even lower */
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -850,6 +850,7 @@ body.modal-active #app .bottom-nav-container {
 .modal-header-centered {
     position: absolute;
     left: 50%;
+    top: 107px; /* Moved even lower */
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
@@ -950,8 +951,8 @@ body.modal-active #app .bottom-nav-container {
 }
 
 .lottie-slide img {
-    width: 160px; /* Smaller image */
-    height: 160px;
+    width: 200px; /* Adjusted size for creator photos */
+    height: 200px;
     object-fit: contain;
 }
 

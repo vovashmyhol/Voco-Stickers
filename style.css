@@ -106,6 +106,32 @@ body.creators-active .scroll-headroom {
     pointer-events: none;
 }
 
+.mint-preview-card {
+    width: 140px;
+    height: 200px;
+    background: #1c1c1e;
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    margin-bottom: 25px;
+    z-index: 10;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth bg and scale changes */
+}
+
+.preview-sticker {
+    width: 90px;
+    height: 90px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease-in-out; /* For slideshow fade */
+}
+
 /* Header Content */
 .main-header {
     display: flex;
@@ -216,6 +242,33 @@ body.creators-active .scroll-headroom {
     padding: 0 30px;
     color: white;
     letter-spacing: 0.5px;
+}
+
+.collections-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    margin-bottom: 20px;
+}
+
+.collections-header .section-title {
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.soon-badge {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
 }
 
 .collections-carousel {
@@ -740,7 +793,7 @@ body.modal-active #app .bottom-nav-container {
     background: #1c1c1e;
     border-radius: 0;
     position: relative;
-    padding: 60px 20px 100px 20px; /* Increased top padding significantly */
+    padding: 100px 20px 100px 20px; /* Increased top padding significantly */
     margin-bottom: 0;
     transform: translate3d(0, 110%, 0);
     will-change: transform;
@@ -968,6 +1021,22 @@ body.modal-active #app .bottom-nav-container {
     align-self: stretch; /* Fill full width */
 }
 
+.pack-author-sub {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+    margin-top: 6px;
+}
+
+.pack-author-sub a {
+    text-decoration: none;
+}
+
+.pack-author-sub span {
+    color: #40B3FF;
+    font-weight: 600;
+}
+
 /* Info Card Style - Exactly like photo */
 .info-card {
     width: 100%;
@@ -1177,12 +1246,13 @@ body.modal-active #app .bottom-nav-container {
     position: relative;
     z-index: 2;
     flex: 1;
-    padding: 140px 20px 100px 20px; 
+    padding: 150px 16px 100px 16px; 
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: auto 0; /* Centering when short */
     width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Prevent horizontal scrolling from children */
 }
 
 .profile-main-info {
@@ -1387,6 +1457,7 @@ body.modal-active #app .bottom-nav-container {
 }
 
 .profile-collections-selector {
+    flex: 1; /* Take remaining space */
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
@@ -1400,6 +1471,44 @@ body.modal-active #app .bottom-nav-container {
     transition: all 0.2s ease;
     position: relative;
     z-index: 9999;
+}
+
+.crafted-toggle-btn {
+    width: 58px;
+    height: 58px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+
+.crafted-toggle-btn img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.crafted-toggle-btn.active {
+    background: rgba(48, 130, 246, 0.2);
+    border-color: rgba(48, 130, 246, 0.4);
+    box-shadow: 0 0 20px rgba(48, 130, 246, 0.2);
+}
+
+.crafted-toggle-btn.active img {
+    transform: scale(1.2) rotate(5deg);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+}
+
+.crafted-toggle-btn:active {
+    transform: scale(0.92);
 }
 
 .profile-collections-selector:active {
@@ -1438,6 +1547,11 @@ body.modal-active #app .bottom-nav-container {
     font-weight: 700;
     margin-bottom: 8px;
     color: white;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 10px;
 }
 
 
@@ -1475,22 +1589,27 @@ body.modal-active #app .bottom-nav-container {
 .inventory-grid {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    padding: 0 5px 120px 5px; /* Added bottom padding for scroll effect */
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* Prevent content from expanding column width */
+    gap: 8px;
+    padding: 20px 0 120px 0; 
+    justify-items: center;
+    align-items: start;
 }
 
 .inventory-item {
-    background: #1c1c1e; /* Card background from photo */
-    border-radius: 20px;
-    padding: 12px 8px;
+    background: #1c1c1e;
+    border-radius: 18px; /* Slightly smoother for small cards */
+    padding: 10px 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%; /* Ensure it fills the grid column */
     aspect-ratio: 1 / 1.45;
     transition: transform 0.2s;
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
 }
 
 .inventory-item:active {
@@ -1498,12 +1617,12 @@ body.modal-active #app .bottom-nav-container {
 }
 
 .inventory-sticker-container {
-    width: 90%;
+    width: 100%;
     height: 70%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     pointer-events: none;
 }
 
@@ -1511,20 +1630,20 @@ body.modal-active #app .bottom-nav-container {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 800;
     color: white;
     margin-bottom: 4px;
 }
 
 .inventory-item-price img {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
 }
 
 .inventory-item-name {
-    font-size: 0.75rem;
-    color: white;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.8);
     font-weight: 600;
     text-transform: none;
     letter-spacing: normal;
@@ -1536,6 +1655,7 @@ body.modal-active #app .bottom-nav-container {
     text-overflow: ellipsis;
     font-family: var(--font-main); 
     pointer-events: none;
+    padding: 0 4px;
 }
 
 /* Empty State Styling */
@@ -1931,6 +2051,9 @@ body.modal-active #app .bottom-nav-container {
     margin: 0 0 25px 0;
     width: 100%;
     position: relative; /* Context for the floating menu */
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 .profile-collections-selector {
@@ -2022,6 +2145,23 @@ body.modal-active #app .bottom-nav-container {
     background: rgba(64, 179, 255, 0.1);
 }
 
+.opt-left {
+    display: flex;
+    align-items: center;
+}
+
+.opt-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+.opt-icon-small {
+    width: 22px; /* Increased from 18px */
+    height: 22px;
+    object-fit: contain;
+}
+
 .opt-radio {
     width: 20px;
     height: 20px;
@@ -2050,6 +2190,553 @@ body.modal-active #app .bottom-nav-container {
 .filter-opt.active .opt-radio::after {
     transform: scale(1);
 }
+
+/* ===== Minting & Crafting UI ===== */
+.minting-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+    background: radial-gradient(circle at 50% 50%, #0a1226 0%, #050b1a 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.crafting-nexus {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.nexus-glow {
+    position: absolute;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle, rgba(48, 130, 246, 0.2) 0%, transparent 70%);
+    animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.nexus-core {
+    width: 180px;
+    height: 180px;
+    z-index: 10;
+    filter: drop-shadow(0 0 30px rgba(48, 130, 246, 0.5));
+}
+
+.swirling-stickers {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+}
+
+.swirl-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    margin-top: -30px;
+    margin-left: -30px;
+    opacity: 0;
+}
+
+.swirl-item img, .swirl-item lottie-player {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.crafting-text {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    animation: textBreathe 2s ease-in-out infinite;
+}
+
+@keyframes textBreathe {
+    0%, 100% { opacity: 0.5; letter-spacing: 1px; }
+    50% { opacity: 1; letter-spacing: 3px; }
+}
+
+/* Mint Result Modal */
+.mint-result-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 21000;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.result-content {
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.minted-card-wrap {
+    perspective: 1000px;
+    margin-bottom: 30px;
+    animation: cardReveal 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes cardReveal {
+    0% { transform: scale(0.5) rotateY(90deg); opacity: 0; }
+    100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+}
+
+.minted-card {
+    width: 260px;
+    height: 360px;
+    border-radius: 30px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+    background: #1c1c1e; /* Default */
+}
+
+/* Gradients for Cards (15 Total) */
+/* Common (7) */
+.grad-1 { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+.grad-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.grad-3 { background: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%); }
+.grad-4 { background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%); }
+.grad-5 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.grad-6 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.grad-7 { background: linear-gradient(135deg, #FF512F 0%, #DD2476 100%); } /* Sunset Flare */
+
+/* Rare (4) */
+.grad-8 { background: linear-gradient(135deg, #2af598 0%, #08aeea 100%); }
+.grad-9 { background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%); }
+.grad-10 { background: linear-gradient(135deg, #b721ff 0%, #21d4fd 100%); }
+.grad-11 { background: linear-gradient(135deg, #f83600 0%, #f9d423 100%); }
+
+/* Epic (2) */
+.grad-12 { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); }
+.grad-13 { background: linear-gradient(135deg, #09203f 0%, #537895 100%); }
+
+/* Legendary (2) */
+.grad-14 { background: linear-gradient(135deg, #000000 0%, #434343 100%); } /* Midnight Black */
+.grad-15 { background: linear-gradient(135deg, #203a43 0%, #2c5364 100%, #0f2027 100%); } /* Oceanic Abyss */
+
+
+.card-number {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+}
+
+.card-sticker-container {
+    width: 180px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+}
+
+.card-sticker-container img, .card-sticker-container lottie-player {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.card-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 45%, rgba(255, 255, 255, 0.1) 50%, transparent 55%);
+    background-size: 200% 200%;
+    animation: shineCard 4s infinite linear;
+    pointer-events: none;
+}
+
+@keyframes shineCard {
+    0% { background-position: -200% -200%; }
+    100% { background-position: 200% 200%; }
+}
+
+.result-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.result-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 40px;
+    max-width: 280px;
+}
+
+.result-close-btn {
+    width: 240px;
+    padding: 16px;
+    border-radius: 100px;
+    background: #3082F6;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(48, 130, 246, 0.3);
+    transition: transform 0.2s;
+}
+
+.result-close-btn:active {
+    transform: scale(0.96);
+}
+
+/* Update Inventory Item for Minted Items */
+.inventory-item.minted {
+    padding: 6px 4px; /* Further reduced padding to maximize space for crafted content */
+    background: #2c2c2e;
+}
+
+.inventory-item.minted .inventory-sticker-container {
+    border-radius: 14px;
+    width: 100%; /* Full width of available space */
+    height: 82%; /* Significantly taller */
+    margin-top: 4px; /* Very close to the top */
+    margin-bottom: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.inventory-item.minted .item-number {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 0.6rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 2px 4px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 800;
+    z-index: 5;
+}
+
+/* Modal Properties Card */
+.mint-props-card {
+    margin-top: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.highlight-blue {
+    color: #40B3FF !important;
+    font-weight: 700;
+}
+
+/* Rarity Colors */
+.rarity-common { color: #8E8E93 !important; font-weight: 700; }
+.rarity-rare { color: #007AFF !important; font-weight: 700; }
+.rarity-epic { color: #AF52DE !important; font-weight: 700; }
+.rarity-legendary { color: #FFCC00 !important; font-weight: 700; text-shadow: 0 0 8px rgba(255, 204, 0, 0.4); }
+
+
+/* Modal Dynamic Background Overlay */
+.modal-bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 480px;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 100%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 100%);
+}
+
+.is-minted::after, 
+.is-minted .modal-handle,
+.is-minted #modalDots {
+    display: none !important;
+}
+
+.modal-bg-overlay.active {
+    opacity: 0.35;
+}
+
+
+/* Ensure modal contents are above the background */
+.modal-handle {
+    z-index: 10; /* Keep its original absolute positioning */
+}
+
+.modal-top-nav, .modal-body {
+    position: relative;
+    z-index: 2;
+}
+
+/* Mint Confirmation Screen */
+.mint-confirm-content {
+    background: #050b1a;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.mint-showcase, .floating-asset {
+    display: none;
+}
+
+.mint-confirm-body {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.mint-preview-card {
+    width: 215px;
+    height: 300px;
+    border-radius: 26px;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 30px rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255,255,255,0.12);
+    animation: floatingPreview 3s ease-in-out infinite;
+    /* Darken the base gradient with a radial overlay */
+    background-image: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%), 
+                      linear-gradient(135deg, #b721ff 0%, #21d4fd 100%);
+}
+
+.preview-sticker {
+    width: 150px;
+    height: 150px;
+    transform: translateY(-15px);
+}
+
+.preview-badge {
+    position: absolute;
+    bottom: 35px;
+    background: rgba(255,255,255,0.1);
+    padding: 7px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+
+.mint-start-btn {
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    color: white;
+    padding: 18px 32px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-wrap {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.btn-stars-pos {
+    top: 50% !important;
+    left: 50% !important;
+}
+
+
+
+
+.mint-start-btn:active {
+    transform: scale(0.96);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+
+
+@keyframes floatingPreview {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+
+
+.mint-confirm-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: white;
+}
+
+.mint-confirm-text {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.5;
+    margin-bottom: 25px;
+    max-width: 280px;
+}
+
+.mint-warning-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 204, 0, 0.1);
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    font-size: 0.85rem;
+    color: #FFCC00;
+    border: 1px solid rgba(255, 204, 0, 0.2);
+}
+
+.mint-start-btn {
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 12px;
+}
+
+.secondary-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.4);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px;
+}
+
+/* Gift Code Styles */
+.gift-code-trigger-wrap {
+    width: 100%;
+    padding: 40px 0 100px 0;
+    display: flex;
+    justify-content: center;
+    opacity: 0.3;
+    transition: opacity 0.3s;
+}
+
+.gift-code-trigger-wrap:hover {
+    opacity: 0.6;
+}
+
+.gift-code-link {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.gift-modal-content {
+    height: auto !important;
+    min-height: 400px;
+    padding-top: 60px !important;
+    border-radius: 40px 40px 0 0 !important;
+}
+
+.gift-modal-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.gift-modal-subtitle {
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 30px;
+}
+
+.gift-input-wrap {
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 30px;
+}
+
+.gift-input-wrap input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 18px;
+    color: white;
+    font-size: 1.5rem;
+    text-align: center;
+    letter-spacing: 5px;
+    font-family: 'Orbitron', sans-serif;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.gift-input-wrap input:focus {
+    border-color: #3082F6;
+}
+
+#redeemBtn {
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 15px;
+}
+
+
+
+
+
 
 
 

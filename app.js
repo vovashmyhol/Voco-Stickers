@@ -62,7 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initModalGestures();
     initRewardModalGestures();
     initModalSlider();
-    initCollectionsFilter(); // Initialize filter once
+    initCollectionsFilter(); 
+    initMinting(); // New: Initialize minting listeners
+    initGiftSystem(); // New: Initialize gift code system
 
     // Initial tab setup
     window.switchTab = switchTab;
@@ -208,7 +210,36 @@ function initCarousel() {
  */
 
 const INVENTORY_KEY = 'voco_inventory';
+const USED_CODES_KEY = 'voco_used_codes';
+
+const allKittenStickers = [
+    'Kitten/CAACAgIAAxUAAWn8ngkaS9tMy3lKuzIr40hAyubNAAK8iQAChGexS4oMmkGTCWnzOwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8ngl0Uic8CPFn8PaNlxJiYMvfAALhjgACFSupS0M1XTEi-JfEOwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8ngl7r-dZimllMsYM5Df_KmpYAALLhAACsX2oS9hrui4DeKoNOwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8nglKGrtEu5_12GtTsCPlsE-CAAIqgAAC4SKwS3OD04mbQpy0OwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8nglViygopzBLGP1ncUGJbqJxAAIimQACsBSpSzY51wAB1Vte7TsE.webp',
+    'Kitten/CAACAgIAAxUAAWn8nglXfpjgdGBxk9cUmN-rdVlhAAL1rQACrKSpS1G2Zy6MJRKwOwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8nglzg7EjC8t-OkDraKsuOsoJAAIEhAAC3p-wS8qBNPSHzJv5OwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8ngm6t03GV5JHzRdbUN6fm0wRAALBngAC-A6pSxZ1haB1v15xOwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8ngmeBwl1_yp9c9_WHlTa-XQwAAIhigAC6uqoS7oCGkyd2tf_OwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8ngmgIgbykSXGFyC6BK35sNeEAAJbiQACksqpSzFIjsCS_wWBOwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8ngmqZf5AJbl1S2LGjO1HRj3KAAJxmAACbbGpS5m7ONJOa_KyOwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8ngmwZ32WyYWJc7pXbOq49SO8AAJhkgACRDapS1J3lQ223rAVOwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8ngnBNZgjgtUo8knekJleUs9gAAL9nwACqsmpS3jKuSTGAyHXOwQ.webp',
+    'Kitten/CAACAgIAAxUAAWn8ngnDhAABwrWBfzC2N3SFbJEq7QACbZgAAor0qEtsXHpThj8f6zsE.webp',
+    'Kitten/CAACAgIAAxUAAWn8ngnU2O29CDm74uvXtPqCnCOaAALlgwACZBaoS_IaSnR-SYJoOwQ.webp',
+    'Kitten/CAACAgIAAxkBAAEDuTZp_J393n7Qp-lKIQxVL_rGa2RqDQACsJIAAiG5qEtR64MguW7vITsE.webp'
+];
+
+const allVocoStickers = [
+    'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json',
+    'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Choco.json',
+    'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Pink.json',
+    'https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Sad.json'
+];
+
 let inventory = [];
+let usedCodes = [];
 
 /**
  * PHASE 2: Storage, Modal, Purchase and Inventory Logic
@@ -256,11 +287,14 @@ const storage = {
 
 async function initInventory() {
     const data = await storage.get(INVENTORY_KEY);
+    const codesData = await storage.get(USED_CODES_KEY);
     try {
         inventory = data ? JSON.parse(data) : [];
+        usedCodes = codesData ? JSON.parse(codesData) : [];
         console.log('Inventory loaded:', inventory);
     } catch (e) {
         inventory = [];
+        usedCodes = [];
     }
     // Render inventory once loaded
     renderInventory();
@@ -285,14 +319,21 @@ if (kittenPack) {
 }
 
 let currentFilter = 'all';
+let isCraftedFilterActive = false; // Toggle state: false = regular packs, true = crafted items
 
 function handleFilterSelection(buttonId) {
     currentFilter = buttonId;
-    const titleSpan = document.querySelector('#collectionsSelector .selector-title');
-    if (titleSpan) {
-        if (buttonId === 'all') titleSpan.textContent = 'Collections';
-        else if (buttonId === 'VocoX') titleSpan.textContent = 'Vatman family';
-        else if (buttonId === 'Kitten') titleSpan.textContent = 'Kitten Pack';
+    const titleContainer = document.querySelector('#collectionsSelector .selector-content');
+    if (titleContainer) {
+        if (buttonId === 'all') {
+            titleContainer.innerHTML = '<span class="selector-title">Collections</span>';
+        } else if (buttonId === 'VocoX') {
+            titleContainer.innerHTML = '<span class="selector-title">Vatman family</span><img src="verify.WEBP" alt="Verified" class="opt-icon-small" style="margin-left: 4px;">';
+        } else if (buttonId === 'Kitten') {
+            titleContainer.innerHTML = '<span class="selector-title">Kitten Pack</span>';
+        } else if (buttonId === 'crafted') {
+            titleContainer.innerHTML = '<img src="Mint.webp" alt="Crafted" class="opt-icon" style="width: 20px; height: 20px; margin-right: 8px;"><span class="selector-title">Crafted</span>';
+        }
     }
     renderInventory();
 }
@@ -343,6 +384,17 @@ function initCollectionsFilter() {
             selector.classList.remove('active');
         }
     });
+
+    // Crafted Toggle Logic
+    const toggleBtn = document.getElementById('craftedToggle');
+    if (toggleBtn) {
+        toggleBtn.onclick = () => {
+            isCraftedFilterActive = !isCraftedFilterActive;
+            toggleBtn.classList.toggle('active', isCraftedFilterActive);
+            tg.HapticFeedback.impactOccurred('medium');
+            renderInventory();
+        };
+    }
 }
 
 function openProfile() {
@@ -437,6 +489,15 @@ function renderInventory() {
     grid.innerHTML = '';
     packCount.textContent = inventory.length;
 
+    const getRarity = (gradClass) => {
+        if (!gradClass) return 'Common';
+        const num = parseInt(gradClass.replace('grad-', ''));
+        if (gradClass === 'grad-14' || gradClass === 'grad-15') return 'Legendary';
+        if (num >= 12) return 'Epic';
+        if (num >= 8) return 'Rare';
+        return 'Common';
+    };
+
     // Show crown if 5 or more packs
     const profileCrown = document.querySelector('.user-crown');
     if (profileCrown) {
@@ -447,19 +508,29 @@ function renderInventory() {
         }
     }
 
-    // Filter inventory based on selection
-    let displayInventory = inventory;
-    if (currentFilter !== 'all') {
-        displayInventory = inventory.filter(item => {
-            const id = typeof item === 'string' ? item : item.id;
-            return id === currentFilter;
-        });
-    }
+    // Filter inventory based on selection and toggle state
+    let displayInventory = inventory.filter(item => {
+        // 1. Collection Filter
+        const packId = typeof item === 'string' ? item : item.id;
+        if (currentFilter !== 'all' && packId !== currentFilter) return false;
+
+        // 2. Crafted Toggle Filter
+        const isMinted = item.mintData ? true : false;
+        return isMinted === isCraftedFilterActive;
+    });
 
     if (displayInventory.length === 0) {
         // Render Empty State
         const emptyState = document.createElement('div');
         emptyState.className = 'inventory-empty-state';
+        
+        let emptyMsg = "";
+        if (isCraftedFilterActive) {
+            emptyMsg = currentFilter === 'all' ? "You don't have any crafted items yet" : `No crafted items in ${document.querySelector('#collectionsSelector .selector-title').textContent}`;
+        } else {
+            emptyMsg = currentFilter === 'all' ? "You don't have any packs yet" : `No packs in ${document.querySelector('#collectionsSelector .selector-title').textContent}`;
+        }
+
         emptyState.innerHTML = `
             <div class="empty-lottie-container">
                 <lottie-player 
@@ -471,7 +542,7 @@ function renderInventory() {
                 </lottie-player>
             </div>
             <p class="empty-text">
-                ${currentFilter === 'all' ? "You don't have any packs yet" : "No packs in this collection"}
+                ${emptyMsg}
             </p>
             <button class="go-market-btn" id="goMarketBtn">Go to market</button>
         `;
@@ -488,33 +559,53 @@ function renderInventory() {
         grid.style.display = 'grid';
         displayInventory.forEach(itemData => {
             const packId = typeof itemData === 'string' ? itemData : itemData.id;
+            const isMinted = itemData.mintData ? true : false;
 
             const isKitten = packId === 'Kitten';
             const item = document.createElement('div');
-            item.className = 'inventory-item';
+            item.className = isMinted ? 'inventory-item minted' : 'inventory-item';
 
             let itemContent = '';
-            if (isKitten) {
-                itemContent = `<img src="Kitten/CAACAgIAAxUAAWn8ngkaS9tMy3lKuzIr40hAyubNAAK8iQAChGexS4oMmkGTCWnzOwQ.webp" style="width: 100%; height: 100%; object-fit: contain;">`;
+            if (isMinted) {
+                // Render Minted Card Style
+                const m = itemData.mintData;
+                const stickerSrc = m.src;
+                
+                const stickerElement = m.isLottie ? 
+                    `<lottie-player src="${stickerSrc}" background="transparent" speed="1" style="width: 100%; height: 100%;"></lottie-player>` :
+                    `<img src="${stickerSrc}" style="width: 100%; height: 100%; object-fit: contain;">`;
+
+                const rarity = getRarity(m.gradientClass);
+
+                item.innerHTML = `
+                    <div class="inventory-sticker-container ${m.gradientClass}">
+                        <div class="item-number">${rarity}</div>
+                        ${stickerElement}
+                    </div>
+                    <div class="inventory-item-name">${isKitten ? 'Kitten' : 'Vatman'} #${m.serial}</div>
+                `;
             } else {
-                itemContent = `
-                    <lottie-player 
-                        src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json" 
-                        background="transparent" 
-                        speed="1" 
-                        style="width: 100%; height: 100%;">
-                    </lottie-player>`;
+                // Original Pack Style
+                if (isKitten) {
+                    itemContent = `<img src="Kitten/CAACAgIAAxUAAWn8ngkaS9tMy3lKuzIr40hAyubNAAK8iQAChGexS4oMmkGTCWnzOwQ.webp" style="width: 100%; height: 100%; object-fit: contain;">`;
+                } else {
+                    itemContent = `<lottie-player src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json" background="transparent" speed="1" style="width: 100%; height: 100%;"></lottie-player>`;
+                }
+
+                item.innerHTML = `
+                    <div class="inventory-sticker-container">
+                        ${itemContent}
+                    </div>
+                    <div class="inventory-item-name">${isKitten ? 'Kitten Pack' : 'Vatman family'}</div>
+                `;
             }
 
-            item.innerHTML = `
-                <div class="inventory-sticker-container">
-                    ${itemContent}
-                </div>
-                <div class="inventory-item-name">${isKitten ? 'Kitten Pack' : 'Vatman family'}</div>
-            `;
-
             item.addEventListener('click', () => {
-                openPackModal(packId, 'profile');
+                if (isMinted) {
+                    openPackModal(packId, 'profile', itemData);
+                } else {
+                    openPackModal(packId, 'profile');
+                }
             });
 
             grid.appendChild(item);
@@ -563,7 +654,7 @@ function initModalSlider() {
 
 let currentModalPackId = 'VocoX';
 
-function openPackModal(packId, context = 'market') {
+function openPackModal(packId, context = 'market', mintedData = null) {
     const modalEl = document.getElementById('packModal');
     if (!modalEl) {
         console.error('Modal element not found!');
@@ -571,11 +662,17 @@ function openPackModal(packId, context = 'market') {
     }
 
     currentModalPackId = packId;
-    updateModalUI(packId, context);
+    updateModalUI(packId, context, mintedData);
 
     const modalContent = modalEl.querySelector('.modal-content');
     modalContent.classList.remove('dragging');
-    modalContent.style.transform = ''; // Clear any inline styles to let CSS classes work
+    modalContent.style.transform = ''; 
+
+    if (mintedData) {
+        modalContent.classList.add('is-minted');
+    } else {
+        modalContent.classList.remove('is-minted');
+    }
 
     // Impact feedback first
     if (tg.HapticFeedback) {
@@ -609,7 +706,7 @@ function initModalGestures() {
     // Gestures disabled — modal is full-screen, close via Telegram Back button
 }
 
-function updateModalUI(packId, context = 'market') {
+function updateModalUI(packId, context = 'market', mintedData = null) {
     const marketInfo = document.getElementById('marketInfo');
     const ownerRow = document.getElementById('ownerRow');
     const buyBtn = document.getElementById('buyBtn');
@@ -620,7 +717,51 @@ function updateModalUI(packId, context = 'market') {
     const slider = document.getElementById('lottieSlider');
     const modalDotsContainer = document.getElementById('modalDots');
 
-    console.log('Updating Modal UI for:', packId, 'Context:', context);
+    // Properties mapping for background names (15 Total)
+    const backgroundNames = {
+        'grad-1': 'Deep Space',
+        'grad-2': 'Sunset Mist',
+        'grad-3': 'Electric Cyan',
+        'grad-4': 'Jungle Glow',
+        'grad-5': 'Sky Dream',
+        'grad-6': 'Royal Purple',
+        'grad-7': 'Sunset Flare',
+        'grad-8': 'Toxic Mint',
+        'grad-9': 'Crimson Flare',
+        'grad-10': 'Vivid Orchid',
+        'grad-11': 'Solar Flare',
+        'grad-12': 'Phantom Indigo',
+        'grad-13': 'Nordic Night',
+        'grad-14': 'Midnight Onyx', // Legendary
+        'grad-15': 'Abyssal Abyss'   // Legendary
+    };
+
+    const rarityNames = {
+        'grad-1': 'Common', 'grad-2': 'Common', 'grad-3': 'Common', 'grad-4': 'Common', 'grad-5': 'Common', 'grad-6': 'Common', 'grad-7': 'Common',
+        'grad-8': 'Rare', 'grad-9': 'Rare', 'grad-10': 'Rare', 'grad-11': 'Rare',
+        'grad-12': 'Epic', 'grad-13': 'Epic',
+        'grad-14': 'Legendary', 'grad-15': 'Legendary'
+    };
+
+    const rarityClasses = {
+        'Common': 'rarity-common',
+        'Rare': 'rarity-rare',
+        'Epic': 'rarity-epic',
+        'Legendary': 'rarity-legendary'
+    };
+
+    const bgOverlay = document.getElementById('modalBgOverlay');
+
+    console.log('Updating Modal UI for:', packId, 'Context:', context, 'Minted:', !!mintedData);
+
+    // Apply Minted Background if available
+    if (bgOverlay) {
+        if (mintedData) {
+            bgOverlay.className = `modal-bg-overlay active ${mintedData.mintData.gradientClass}`;
+        } else {
+            bgOverlay.className = 'modal-bg-overlay';
+        }
+    }
 
     // Configuration based on packId
     let price = '15';
@@ -663,15 +804,28 @@ function updateModalUI(packId, context = 'market') {
 
     if (priceValue) priceValue.textContent = price;
     if (supplyValue) supplyValue.textContent = supply;
-    if (packTitle) packTitle.textContent = title;
+    
+    // Set Title & Author
+    if (mintedData) {
+        if (packTitle) {
+            const author = packId === 'Kitten' ? '@vovnx' : '@voco_in';
+            const authorLink = packId === 'Kitten' ? 'https://t.me/vovnx' : 'https://t.me/voco_in';
+            packTitle.innerHTML = `${title} #${mintedData.mintData.serial}<div class="pack-author-sub">by <a href="${authorLink}" target="_blank"><span>${author}</span></a></div>`;
+        }
+    } else {
+        if (packTitle) packTitle.textContent = title;
+    }
 
     // Update Slider Content
     if (slider) {
         slider.innerHTML = '';
-        slides.forEach(src => {
+        const currentSlides = mintedData ? [mintedData.mintData.src] : slides;
+        const currentLottie = mintedData ? mintedData.mintData.isLottie : isLottie;
+        
+        currentSlides.forEach(src => {
             const slide = document.createElement('div');
             slide.className = 'lottie-slide';
-            if (isLottie) {
+            if (currentLottie) {
                 slide.innerHTML = `<lottie-player src="${src}" background="transparent" speed="1" loop autoplay></lottie-player>`;
             } else {
                 slide.innerHTML = `<img src="${src}" alt="Pack Sticker">`;
@@ -684,13 +838,50 @@ function updateModalUI(packId, context = 'market') {
     // Update Pagination Dots
     if (modalDotsContainer) {
         modalDotsContainer.innerHTML = '';
-        slides.forEach((_, i) => {
+        const dotCount = mintedData ? 1 : slides.length;
+        for(let i=0; i<dotCount; i++) {
             const dot = document.createElement('span');
             dot.className = i === 0 ? 'm-dot active' : 'm-dot';
             modalDotsContainer.appendChild(dot);
-        });
-        // Initialize smart dots immediately
+        }
         updateSmartDots(0);
+    }
+
+    // Handle Properties Section for Minted items
+    let propertiesEl = document.getElementById('mintProperties');
+    if (!propertiesEl && mintedData) {
+        propertiesEl = document.createElement('div');
+        propertiesEl.id = 'mintProperties';
+        propertiesEl.className = 'info-card mint-props-card';
+        marketInfo.parentNode.insertBefore(propertiesEl, marketInfo.nextSibling);
+    }
+    
+    if (propertiesEl) {
+        if (mintedData) {
+            const m = mintedData.mintData;
+            const rarity = rarityNames[m.gradientClass] || 'Common';
+            propertiesEl.style.display = 'block';
+            propertiesEl.innerHTML = `
+                <div class="info-row">
+                    <span class="info-label">Rarity</span>
+                    <span class="info-value ${rarityClasses[rarity]}">${rarity}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Background</span>
+                    <span class="info-value highlight-blue">${backgroundNames[m.gradientClass] || 'Standard'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Model</span>
+                    <span class="info-value">${title}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Serial</span>
+                    <span class="info-value">#${m.serial}</span>
+                </div>
+            `;
+        } else {
+            propertiesEl.style.display = 'none';
+        }
     }
 
     if (context === 'profile') {
@@ -698,11 +889,32 @@ function updateModalUI(packId, context = 'market') {
         buyBtn.textContent = 'Open';
         buyBtn.classList.add('btn-small');
         if (extraActions) extraActions.style.display = 'flex';
+        
+        // Handle Mint Button Visibility/State (only for non-minted packs)
+        const mintBtn = document.getElementById('mintBtn');
+        if (mintBtn) {
+            if (mintedData) {
+                mintBtn.style.display = 'none'; // Hide if already minted
+            } else {
+                mintBtn.style.display = 'flex';
+                const hasRegularPack = inventory.some(item => (item.id === packId && !item.mintData));
+                if (hasRegularPack) {
+                    mintBtn.style.opacity = '1';
+                    mintBtn.style.filter = 'none';
+                    mintBtn.style.pointerEvents = 'auto';
+                } else {
+                    mintBtn.style.opacity = '0.5';
+                    mintBtn.style.filter = 'grayscale(1)';
+                    mintBtn.style.pointerEvents = 'none';
+                }
+            }
+        }
     } else {
         if (ownerRow) ownerRow.style.display = 'none';
         buyBtn.textContent = 'Get';
         buyBtn.classList.remove('btn-small');
         if (extraActions) extraActions.style.display = 'none';
+        if (propertiesEl) propertiesEl.style.display = 'none';
     }
 }
 
@@ -970,6 +1182,349 @@ function stopContinuousRewardStars() {
         clearInterval(rewardStarsInterval);
         rewardStarsInterval = null;
     }
+}
+
+function initMinting() {
+    const mintBtn = document.getElementById('mintBtn');
+    const resultCloseBtn = document.getElementById('mintResultCloseBtn');
+    
+    // Confirmation Modal Elements
+    const confirmModal = document.getElementById('mintConfirmModal');
+    const confirmStartBtn = document.getElementById('confirmMintStart');
+    const cancelMintBtn = document.getElementById('cancelMint');
+    const closeConfirmBtn = document.getElementById('closeMintConfirm');
+
+    if (mintBtn) {
+        mintBtn.onclick = () => {
+            tg.HapticFeedback.impactOccurred('medium');
+            if (confirmModal) {
+                const packName = currentModalPackId === 'Kitten' ? 'Kitten Pack' : 'Vatman family';
+                
+                // Update Modal Text
+                const title = confirmModal.querySelector('.mint-confirm-title');
+                const text = confirmModal.querySelector('.mint-confirm-text');
+                if (title) title.textContent = `Craft ${packName}`;
+                if (text) text.innerHTML = `This action will consume your <b>${packName}</b> to create <b>one unique sticker</b> with a random rarity, background, and serial number.`;
+
+                populateMintShowcase(currentModalPackId);
+                startButtonStars(); 
+                startPreviewSlideshow(currentModalPackId);
+                confirmModal.style.display = 'flex';
+                setTimeout(() => confirmModal.classList.add('active'), 10);
+            }
+        };
+    }
+
+    let btnStarsInterval = null;
+    function startButtonStars() {
+        if (btnStarsInterval) clearInterval(btnStarsInterval);
+        btnStarsInterval = setInterval(() => {
+            createStarExplosion(2, true, 'btnStarsContainer');
+        }, 150);
+    }
+
+    let slideshowInterval = null;
+    function startPreviewSlideshow(packId) {
+        const stickers = packId === 'Kitten' ? allKittenStickers : allVocoStickers;
+        const card = document.querySelector('.mint-preview-card');
+        const container = card ? card.querySelector('.preview-sticker') : null;
+        const badge = card ? card.querySelector('.preview-badge') : null;
+        if (!card || !container) return;
+
+        let index = 0;
+        const rarities = ['Common #321', 'Rare #088', 'Epic #007', 'Legendary #001'];
+        
+        // Initial set (immediately)
+        const setContent = (idx) => {
+            const src = stickers[idx];
+            const isLottie = src.endsWith('.json');
+            container.innerHTML = isLottie ? 
+                `<lottie-player src="${src}" background="transparent" speed="1" loop autoplay></lottie-player>` :
+                `<img src="${src}" style="width: 100%; height: 100%; object-fit: contain;">`;
+            
+            const gradNum = Math.floor(Math.random() * 15) + 1;
+            card.className = `mint-preview-card grad-${gradNum}`;
+            if (badge) {
+                const rIdx = Math.floor(Math.random() * rarities.length);
+                const serial = Math.floor(100 + Math.random() * 899);
+                const rarityText = rarities[rIdx].split(' #')[0];
+                badge.textContent = `${rarityText} #${serial}`;
+            }
+        };
+
+        setContent(0); // Set first item immediately
+
+        if (slideshowInterval) clearInterval(slideshowInterval);
+        slideshowInterval = setInterval(() => {
+            index = (index + 1) % stickers.length;
+            
+            // Fade out
+            container.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                setContent(index);
+                // Fade in
+                container.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            }, 300);
+        }, 2000);
+    }
+
+    function stopPreviewSlideshow() {
+        if (slideshowInterval) {
+            clearInterval(slideshowInterval);
+            slideshowInterval = null;
+        }
+    }
+
+    function stopButtonStars() {
+        if (btnStarsInterval) {
+            clearInterval(btnStarsInterval);
+            btnStarsInterval = null;
+        }
+    }
+
+    function populateMintShowcase(packId) {
+        const showcase = document.getElementById('mintShowcase');
+        if (!showcase) return;
+        showcase.innerHTML = '';
+
+        const slides = packId === 'Kitten' ? allKittenStickers : allVocoStickers;
+
+        // Symmetrical positions (Top Left, Top Right, Bottom Left, Bottom Right)
+        const positions = [
+            { top: '15%', left: '10%' },
+            { top: '15%', right: '10%' },
+            { bottom: '25%', left: '10%' },
+            { bottom: '25%', right: '10%' }
+        ];
+
+        positions.forEach((pos, i) => {
+            const asset = document.createElement('div');
+            asset.className = 'floating-asset';
+            
+            // Apply position
+            Object.keys(pos).forEach(key => asset.style[key] = pos[key]);
+            
+            const src = slides[i % slides.length];
+            const isLottie = src.endsWith('.json');
+            asset.innerHTML = isLottie ? 
+                `<lottie-player src="${src}" background="transparent" speed="1" loop autoplay></lottie-player>` :
+                `<img src="${src}" style="width: 100%; height: 100%; object-fit: contain;">`;
+            
+            // Randomize animation delay for natural feel
+            asset.style.animationDelay = `${i * 0.5}s`;
+            
+            showcase.appendChild(asset);
+        });
+    }
+
+    if (confirmStartBtn) {
+        confirmStartBtn.onclick = () => {
+            if (confirmModal) {
+                confirmModal.classList.remove('active');
+                stopButtonStars(); // Stop the stars
+                setTimeout(() => confirmModal.style.display = 'none', 500);
+            }
+            tg.HapticFeedback.impactOccurred('heavy');
+            handleMint(currentModalPackId);
+        };
+    }
+
+    if (cancelMintBtn) cancelMintBtn.onclick = () => closeConfirm();
+    if (closeConfirmBtn) closeConfirmBtn.onclick = () => closeConfirm();
+
+    function closeConfirm() {
+        if (confirmModal) {
+            confirmModal.classList.remove('active');
+            stopButtonStars(); // Stop the stars
+            stopPreviewSlideshow(); // Stop the slideshow
+            setTimeout(() => confirmModal.style.display = 'none', 500);
+        }
+        tg.HapticFeedback.impactOccurred('light');
+    }
+
+    if (resultCloseBtn) {
+        resultCloseBtn.onclick = () => {
+            document.getElementById('mintResultModal').style.display = 'none';
+            closeModal();
+            renderInventory();
+        };
+    }
+}
+
+async function handleMint(packId) {
+    const overlay = document.getElementById('mintingOverlay');
+    const swirler = document.getElementById('swirlingStickers');
+    if (!overlay || !swirler) return;
+
+    swirler.innerHTML = '';
+    
+    // Use the actual full slides for the pack
+    const allPackSlides = packId === 'Kitten' ? allKittenStickers : allVocoStickers;
+
+    // Create swirling items using ALL stickers from the pack
+    for (let i = 0; i < 20; i++) {
+        const item = document.createElement('div');
+        item.className = 'swirl-item';
+        const src = allPackSlides[i % allPackSlides.length];
+        const isLottie = src.endsWith('.json');
+        
+        item.innerHTML = isLottie ? 
+            `<lottie-player src="${src}" background="transparent" speed="1"></lottie-player>` :
+            `<img src="${src}">`;
+            
+        swirler.appendChild(item);
+
+        const radius = 60 + Math.random() * 100;
+        const startAngle = Math.random() * Math.PI * 2;
+        
+        item.animate([
+            { transform: 'translate(0, 0) scale(0)', opacity: 0 },
+            { transform: `translate(${Math.cos(startAngle)*radius}px, ${Math.sin(startAngle)*radius}px) scale(0.8)`, opacity: 0.8, offset: 0.2 },
+            { transform: `translate(0, 0) scale(0.2) rotate(1080deg)`, opacity: 0, offset: 1 }
+        ], {
+            duration: 2500,
+            delay: i * 80,
+            iterations: Infinity
+        });
+    }
+
+    overlay.style.display = 'flex';
+
+    setTimeout(async () => {
+        const packIndex = inventory.findIndex(item => item.id === packId && !item.mintData);
+        if (packIndex === -1) { overlay.style.display = 'none'; return; }
+
+        const randomSticker = allPackSlides[Math.floor(Math.random() * allPackSlides.length)];
+        const isRareNumber = Math.random() < 0.1;
+        const serial = isRareNumber ? 
+            Math.floor(100 + Math.random() * 899).toString() :
+            Math.floor(1000 + Math.random() * 8999).toString();
+        
+        // Rarity-based Gradient Selection (15 Gradients)
+        const roll = Math.random() * 100;
+        let gradClass = 'grad-1';
+        
+        if (roll < 3) {
+            // Legendary (3%): grad-14 or grad-15
+            gradClass = Math.random() < 0.5 ? 'grad-14' : 'grad-15';
+        } else if (roll < 10) {
+            // Epic (7%): grad-12 to grad-13
+            gradClass = `grad-${Math.floor(12 + Math.random() * 2)}`;
+        } else if (roll < 30) {
+            // Rare (20%): grad-8 to grad-11
+            gradClass = `grad-${Math.floor(8 + Math.random() * 4)}`;
+        } else {
+            // Common (70%): grad-1 to grad-7
+            gradClass = `grad-${Math.floor(1 + Math.random() * 7)}`;
+        }
+
+        inventory[packIndex] = {
+            ...inventory[packIndex],
+            mintData: {
+                src: randomSticker,
+                isLottie: randomSticker.endsWith('.json'),
+                serial: serial,
+                gradientClass: gradClass,
+                mintedAt: new Date().toISOString()
+            }
+        };
+
+        await storage.set(INVENTORY_KEY, JSON.stringify(inventory));
+        overlay.style.display = 'none';
+        showMintResult(inventory[packIndex].mintData);
+    }, 3500);
+}
+
+function showMintResult(data) {
+    const resultModal = document.getElementById('mintResultModal');
+    const card = document.getElementById('mintedCard');
+    const serial = document.getElementById('cardSerialNumber');
+    const container = document.getElementById('cardStickerContainer');
+    
+    if (!resultModal || !card || !serial || !container) return;
+
+    card.className = `minted-card ${data.gradientClass}`;
+    serial.textContent = `#${data.serial}`;
+    container.innerHTML = data.isLottie ? 
+        `<lottie-player src="${data.src}" background="transparent" speed="1" loop autoplay style="width: 100%; height: 100%;"></lottie-player>` :
+        `<img src="${data.src}" style="width: 100%; height: 100%; object-fit: contain;">`;
+
+    resultModal.style.display = 'flex';
+    tg.HapticFeedback.notificationOccurred('success');
+}
+
+/**
+ * Gift Code System Logic
+ */
+function initGiftSystem() {
+    const openBtn = document.getElementById('openGiftCode');
+    const closeBtn = document.getElementById('closeGiftModal');
+    const redeemBtn = document.getElementById('redeemBtn');
+    const modal = document.getElementById('giftModal');
+    const input = document.getElementById('giftInput');
+
+    if (!openBtn || !modal) return;
+
+    const validCodes = ['44411', '88833', '87823', '11177', '74777', '33222', '59999'];
+
+    openBtn.onclick = () => {
+        modal.classList.add('active');
+        document.body.classList.add('modal-active');
+        input.value = '';
+        input.focus();
+        tg.HapticFeedback.impactOccurred('light');
+    };
+
+    const closeGiftModal = () => {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-active');
+    };
+
+    closeBtn.onclick = closeGiftModal;
+
+    redeemBtn.onclick = async () => {
+        const code = input.value.trim();
+        
+        if (!code) {
+            tg.HapticFeedback.notificationOccurred('error');
+            return;
+        }
+
+        if (usedCodes.includes(code)) {
+            alert('This code has already been used.');
+            tg.HapticFeedback.notificationOccurred('error');
+            return;
+        }
+
+        if (validCodes.includes(code)) {
+            // Success!
+            usedCodes.push(code);
+            await storage.set(USED_CODES_KEY, JSON.stringify(usedCodes));
+            
+            // Grant Kitten Pack
+            const instanceId = `Kitten_Gift_${Date.now()}`;
+            inventory.push({
+                id: 'Kitten',
+                instanceId: instanceId,
+                purchasedAt: new Date().toISOString(),
+                isGift: true
+            });
+            await storage.set(INVENTORY_KEY, JSON.stringify(inventory));
+
+            tg.HapticFeedback.notificationOccurred('success');
+            closeGiftModal();
+            
+            // Trigger purchase success effect
+            showSuccessModal('Kitten');
+            renderInventory();
+        } else {
+            alert('Invalid gift code.');
+            tg.HapticFeedback.notificationOccurred('error');
+        }
+    };
 }
 
 

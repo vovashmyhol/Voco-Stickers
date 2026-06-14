@@ -54,12 +54,15 @@
 
                 <!-- Collections Section -->
                 <section class="collections-section">
-                    <h2 class="section-title">Collections</h2>
+                    <div class="collections-header">
+                        <h2 class="section-title">Collections</h2>
+                        <span class="soon-badge">Soon</span>
+                    </div>
                     <div class="collections-carousel" id="collectionsCarousel">
                         <div class="pack-card skeleton-placeholder skeleton"></div>
                         <div class="pack-card skeleton-target" id="vocoPack">
                             <div class="pack-supply-tag">333/333</div>
-                            <img src="пак.jpg" alt="Voco Pack" class="pack-image">
+                            <img src="vatmans%20banner.PNG" alt="Voco Pack" class="pack-image">
                         </div>
                     </div>
                     <div class="carousel-dots">
@@ -73,7 +76,7 @@
                 <div class="creators-header-spacer"></div>
 
                 <div class="creators-banner">
-                    <img src="Прмер.jpg" alt="Banner" class="banner-img"> <!-- Placeholder image -->
+                    <img src="creators%20banner.PNG" alt="Banner" class="banner-img">
                     <div class="banner-content">
                         <h2>Top Creators</h2>
                         <p>Explore packs from the best artists</p>
@@ -154,6 +157,9 @@
                     </div>
                 </div>
                 <div class="profile-collections-wrapper">
+                    <button class="crafted-toggle-btn" id="craftedToggle">
+                        <img src="Mint.webp" alt="Mint">
+                    </button>
                     <div class="profile-collections-selector" id="collectionsSelector">
                         <div class="selector-content">
                             <span class="selector-title">Collections</span>
@@ -169,7 +175,10 @@
                                 <div class="opt-radio"></div>
                             </button>
                             <button class="filter-opt" data-filter="VocoX">
-                                <span>Vatman family</span>
+                                <div class="opt-left">
+                                    <span>Vatman family</span>
+                                    <img src="verify.WEBP" alt="Verified" class="opt-icon-small" style="margin-left: 4px;">
+                                </div>
                                 <div class="opt-radio"></div>
                             </button>
                             <button class="filter-opt" data-filter="Kitten">
@@ -183,6 +192,11 @@
                 <div class="inventory-grid" id="inventoryGrid">
                     <!-- Stickers will be injected here -->
                 </div>
+
+                <!-- Gift Code Trigger (Now inside Profile) -->
+                <div class="gift-code-trigger-wrap">
+                    <span id="openGiftCode" class="gift-code-link">Enter a gift code</span>
+                </div>
             </div>
         </div>
             </div>
@@ -191,6 +205,7 @@
         <!-- Detailed Pack Modal -->
         <div id="packModal" class="modal-overlay">
             <div class="modal-content">
+                <div id="modalBgOverlay" class="modal-bg-overlay"></div>
                 <div class="modal-handle"></div>
                 
                 <div class="modal-top-nav">
@@ -310,6 +325,93 @@
                 <p class="reward-subtitle">You've collected 5 packs. The crown is yours!</p>
                 <button class="reward-ok-btn" id="rewardOkBtn">OK</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Minting Confirmation Modal -->
+    <div id="mintConfirmModal" class="modal-overlay full-screen" style="display: none;">
+        <div class="mint-confirm-content">
+            <!-- Space Background -->
+            <div class="reward-stars-bg"></div>
+            
+            <!-- Showcase of potential results -->
+            <div class="mint-showcase" id="mintShowcase">
+                <!-- Flying cards will be injected here -->
+            </div>
+
+            <button class="modal-close-small" id="closeMintConfirm">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            
+            <div class="mint-confirm-body">
+                <div class="mint-preview-card grad-10">
+                    <div class="preview-sticker">
+                        <lottie-player src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Vatman.json" background="transparent" speed="1" loop autoplay></lottie-player>
+                    </div>
+                    <div class="preview-badge">Epic #007</div>
+                </div>
+
+                <h2 class="mint-confirm-title">Craft Unique Sticker</h2>
+                <p class="mint-confirm-text">
+                    This action will consume your <b>Vatman family</b> pack to create <b>one unique sticker</b> with a random rarity, background, and serial number.
+                </p>
+
+                <div class="btn-wrap">
+                    <div id="btnStarsContainer" class="star-explosion btn-stars-pos"></div>
+                    <button class="main-action-btn mint-start-btn" id="confirmMintStart">Start Crafting</button>
+                </div>
+                <button class="secondary-btn" id="cancelMint">Maybe later</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Minting Overlay (Crafting Animation) -->
+    <div id="mintingOverlay" class="minting-overlay" style="display: none;">
+        <div class="crafting-nexus">
+            <div class="nexus-glow"></div>
+            <div class="nexus-particles"></div>
+            <div class="swirling-stickers" id="swirlingStickers">
+                <!-- Stickers will be injected here during animation -->
+            </div>
+            <div class="nexus-core">
+                <lottie-player src="https://raw.githubusercontent.com/vovashmyhol/Voco-Stickers/refs/heads/main/Splash.json" background="transparent" speed="2" loop autoplay></lottie-player>
+            </div>
+        </div>
+        <h2 class="crafting-text">Crafting Uniqueness...</h2>
+    </div>
+
+    <!-- Mint Result Modal -->
+    <div id="mintResultModal" class="mint-result-overlay" style="display: none;">
+        <div class="result-confetti" id="resultConfetti"></div>
+        <div class="result-content">
+            <div class="minted-card-wrap">
+                <div id="mintedCard" class="minted-card">
+                    <div class="card-number" id="cardSerialNumber">#4421</div>
+                    <div class="card-sticker-container" id="cardStickerContainer">
+                        <!-- Result sticker here -->
+                    </div>
+                    <div class="card-shine"></div>
+                </div>
+            </div>
+            <h2 class="result-title">New Item Created!</h2>
+            <p class="result-subtitle">This sticker is now unique and belongs to you.</p>
+            <button class="result-close-btn" id="mintResultCloseBtn">Awesome!</button>
+        </div>
+    </div>
+
+    <!-- Gift Code Modal -->
+    <div id="giftModal" class="modal-overlay">
+        <div class="modal-content gift-modal-content">
+            <div class="modal-handle"></div>
+            <h2 class="gift-modal-title">Redeem Gift</h2>
+            <p class="gift-modal-subtitle">Enter your secret code below</p>
+            
+            <div class="gift-input-wrap">
+                <input type="number" id="giftInput" placeholder="00000" pattern="\d*">
+            </div>
+
+            <button class="premium-action-button" id="redeemBtn">Redeem</button>
+            <button class="secondary-btn" id="closeGiftModal">Cancel</button>
         </div>
     </div>
 

@@ -305,10 +305,11 @@ const buyBtn = document.getElementById('buyBtn');
 const priceValue = document.getElementById('priceValue');
 
 // 1. Pack click handling (Open Modal)
-document.getElementById('vocoPack').addEventListener('click', () => {
-    tg.HapticFeedback.impactOccurred('medium');
-    openPackModal('VocoX');
-});
+// The Vatman family preview is temporarily non-clickable.
+// document.getElementById('vocoPack').addEventListener('click', () => {
+//     tg.HapticFeedback.impactOccurred('medium');
+//     openPackModal('VocoX');
+// });
 
 const kittenPack = document.getElementById('kittenPack');
 if (kittenPack) {

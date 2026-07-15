@@ -409,6 +409,11 @@ body.creators-active .scroll-headroom {
     box-shadow: none;
 }
 
+#vocoPack.disabled-pack {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .profile-button {
     width: 60px;
     height: 60px;
